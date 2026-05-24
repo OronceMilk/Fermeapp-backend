@@ -1,0 +1,189 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}FermeApp{% endblock %}</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: '#1A3A5C',
+            'navy-soft': '#24486C',
+            skyfarm: '#2E6DA4',
+            leaf: '#7CB518',
+            'leaf-soft': '#EBF4DB',
+            'page-soft': '#F6F8FB',
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/htmx.org@1.9.12" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .nav-active { background: #7CB518; color: #fff !important; }
+    .nav-active span { color: #fff !important; }
+    .htmx-indicator { display: none; }
+    .htmx-request .htmx-indicator, .htmx-request.htmx-indicator { display: inline-flex; }
+    .form-field {
+      width: 100%;
+      border: 1px solid #D8DEE8;
+      border-radius: 0.75rem;
+      background: #F9FAFB;
+      padding: 0.75rem 1rem;
+      color: #1A3A5C;
+      font-size: 0.875rem;
+    }
+    .form-field:focus {
+      outline: none;
+      border-color: #7CB518;
+      box-shadow: 0 0 0 3px rgba(124, 181, 24, 0.18);
+      background: #fff;
+    }
+    ul.errorlist {
+      margin-top: 0.35rem;
+      color: #dc2626;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body class="min-h-screen bg-page-soft text-slate-700" data-user-role="{{ request.user.role|default:'ADMIN' }}">
+  <div class="min-h-screen md:flex">
+    <aside class="md:fixed md:inset-y-0 md:left-0 md:w-64 bg-navy text-white z-30">
+      <div class="flex h-full flex-col">
+        <div class="px-5 py-5 border-b border-white/10">
+          <a href="{% url 'dashboard:home' %}" class="flex items-center gap-3">
+            <span class="grid h-10 w-10 place-items-center rounded-xl bg-leaf text-lg">🌾</span>
+            <span>
+              <span class="block text-xl font-extrabold leading-none">Ferme<span class="text-leaf">App</span></span>
+              <span class="mt-1 block text-xs text-white/55">Gestion agro-pastorale</span>
+            </span>
+          </a>
+        </div>
+
+        <nav class="flex-1 space-y-6 overflow-y-auto px-3 py-5 text-sm">
+          <div>
+            <p class="px-3 text-[10px] font-bold uppercase tracking-widest text-white/40">Principal</p>
+            <div class="mt-2 space-y-1">
+              <a href="{% url 'dashboard:home' %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-white/80 transition hover:bg-white/10 {% if request.resolver_match.namespace == 'dashboard' %}nav-active{% endif %}">
+                <span>🏠</span><span class="font-semibold">Dashboard</span>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <p class="px-3 text-[10px] font-bold uppercase tracking-widest text-white/40">Cheptel</p>
+            <div class="mt-2 space-y-1">
+              <a href="{% url 'cheptel:animal_list' %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-white/80 transition hover:bg-white/10 {% if request.resolver_match.namespace == 'cheptel' and 'animal' in request.resolver_match.url_name %}nav-active{% endif %}">
+                <span>🐄</span><span>Animaux</span>
+              </a>
+              <a href="{% url 'cheptel:rapport_list' %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-white/80 transition hover:bg-white/10 {% if request.resolver_match.namespace == 'cheptel' and 'rapport' in request.resolver_match.url_name %}nav-active{% endif %}">
+                <span>📋</span><span>Rapports</span>
+              </a>
+              <a href="{% url 'cheptel:lot_list' %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-white/80 transition hover:bg-white/10 {% if request.resolver_match.namespace == 'cheptel' and 'lot' in request.resolver_match.url_name %}nav-active{% endif %}">
+                <span>⚙️</span><span>Lots</span>
+              </a>
+              <a href="{% url 'cheptel:traitement_list' %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-white/80 transition hover:bg-white/10 {% if request.resolver_match.namespace == 'cheptel' and 'traitement' in request.resolver_match.url_name %}nav-active{% endif %}">
+                <span>💉</span><span>Traitements</span>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <p class="px-3 text-[10px] font-bold uppercase tracking-widest text-white/40">Exploitation</p>
+            <div class="mt-2 space-y-1">
+              <a href="{% url 'stocks:produit_list' %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-white/80 transition hover:bg-white/10 {% if request.resolver_match.namespace == 'stocks' %}nav-active{% endif %}">
+                <span>📦</span><span>Stocks</span>
+              </a>
+              <a href="{% url 'cultures:parcelle_list' %}" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-white/80 transition hover:bg-white/10 {% if request.resolver_match.namespace == 'cultures' %}nav-active{% endif %}">
+                <span>🌱</span><span>Cultures</span>
+              </a>
+            </div>
+          </div>
+        </nav>
+
+        <div class="border-t border-white/10 p-4">
+          <div class="flex items-center gap-3 rounded-xl bg-white/8 p-3">
+            <div class="grid h-10 w-10 place-items-center rounded-full bg-leaf font-bold">
+              {{ request.user.username|first|upper }}
+            </div>
+            <div class="min-w-0">
+              <p class="truncate text-sm font-semibold">{{ request.user.get_full_name|default:request.user.username }}</p>
+              <p class="text-[10px] font-bold uppercase tracking-widest text-leaf">{{ request.user.role|default:'ADMIN' }}</p>
+            </div>
+          </div>
+          <a href="{% url 'accounts:logout' %}" class="mt-3 block rounded-xl px-3 py-2 text-sm font-semibold text-white/65 transition hover:bg-white/10 hover:text-white">Déconnexion</a>
+        </div>
+      </div>
+    </aside>
+
+    <div class="min-h-screen flex-1 md:ml-64">
+      <header class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:px-8">
+        <div class="flex items-center justify-between">
+          <nav class="flex" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+              <li class="inline-flex items-center">
+                <a href="{% url 'dashboard:home' %}" class="text-sm font-medium text-green-600 hover:text-green-700">
+                    🏠 Dashboard
+                </a>
+              </li>
+              {% block breadcrumb_items %}
+              <!-- Les templates enfants ajouteront ici leurs propres éléments -->
+              {% endblock %}
+            </ol>
+          </nav>
+          <p class="text-sm text-slate-500">{{ date_today|date:"d/m/Y"|default:"" }}</p>
+        </div>
+      </header>
+
+      <main class="px-4 py-6 md:px-8">
+        {% if messages %}
+        <div class="mb-5 space-y-2">
+          {% for message in messages %}
+          <div class="rounded-xl border px-4 py-3 text-sm font-semibold {% if message.tags == 'error' %}border-red-200 bg-red-50 text-red-700{% else %}border-green-200 bg-green-50 text-green-700{% endif %}">
+            {{ message }}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex max-w-sm flex-col gap-2 pointer-events-none"></div>
+
+  {% block extra_scripts %}{% endblock %}
+  {% block extra_js %}{% endblock %}
+  <script src="{% static 'js/notifications.js' %}"></script>
+  <script>
+    document.body.addEventListener('htmx:afterRequest', function(e) {
+      const msg = e.detail.xhr.getResponseHeader('HX-Toast');
+      const type = e.detail.xhr.getResponseHeader('HX-Toast-Type') || 'success';
+      const redirect = e.detail.xhr.getResponseHeader('HX-Redirect');
+      if (msg && window.showToast) window.showToast(msg, type);
+      if (redirect) window.location.href = redirect;
+    });
+    document.body.addEventListener('htmx:responseError', function(e) {
+      const s = e.detail.xhr.status;
+      if (window.showToast) window.showToast(s === 403 ? 'Accès refusé' : s === 404 ? 'Introuvable' : `Erreur ${s}`, 'error');
+    });
+  </script>
+</body>
+</html>

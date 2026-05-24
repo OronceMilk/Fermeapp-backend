@@ -1,0 +1,78 @@
+<!-- cultures/templates/cultures/activite_confirm_delete.html -->
+{% extends 'cultures/base_cultures.html' %}
+
+{% block cultures_content %}
+<div class="delete-container">
+    <div class="delete-card">
+        <div class="delete-icon">⚠️</div>
+        <h2>Supprimer cette activité ?</h2>
+        <p>
+            Êtes-vous sûr de vouloir supprimer l'activité<br>
+            <strong>
+                {% if object.type == "LABOUR" %}🚜 Labour
+                {% elif object.type == "SEMIS" %}🌱 Semis
+                {% elif object.type == "IRRIGATION" %}💧 Irrigation
+                {% elif object.type == "FERTILISATION" %}🌾 Fertilisation
+                {% elif object.type == "DESHERBAGE" %}🌿 Désherbage
+                {% elif object.type == "RECOLTE" %}🚜 Récolte
+                {% else %}{{ object.get_type_display }}
+                {% endif %}
+            </strong>
+        </p>
+        
+        <div class="info-box">
+            <p><strong>📍 Culture / Parcelle :</strong> {{ object.culture_parcelle.culture.nom }} sur {{ object.culture_parcelle.parcelle.nom }}</p>
+            <p><strong>📅 Date :</strong> {{ object.date|date:"d/m/Y" }}</p>
+            {% if object.intrants_utilises %}
+            <p><strong>🧪 Intrants :</strong> {{ object.intrants_utilises }}</p>
+            {% endif %}
+            {% if object.description %}
+            <p><strong>📝 Description :</strong> {{ object.description|truncatechars:100 }}</p>
+            {% endif %}
+            <p><strong>👤 Opérateur :</strong> {{ object.operateur.get_full_name|default:object.operateur.username }}</p>
+        </div>
+        
+        <div class="alert alert-warning">
+            ⚠️ Cette action est irréversible.
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="delete-actions">
+                <button type="submit" class="btn btn-danger">
+                    🗑️ Confirmer la suppression
+                </button>
+                <a href="{% url 'cultures:activite_list' %}" class="btn btn-secondary">
+                    ❌ Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .info-box {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        text-align: left;
+    }
+    .info-box p {
+        margin: 8px 0;
+        color: #2c3e50;
+    }
+    .info-box p:first-child {
+        margin-top: 0;
+    }
+    .info-box p:last-child {
+        margin-bottom: 0;
+    }
+    .alert-warning {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+        text-align: center;
+    }
+</style>
+{% endblock %}

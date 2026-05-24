@@ -1,0 +1,37 @@
+<!-- cultures/templates/cultures/culture_list.html -->
+{% extends 'cultures/base_cultures.html' %}
+
+{% block cultures_content %}
+<div class="page-header">
+    <h1>🌽 Catalogue des cultures</h1>
+</div>
+
+{% if cultures %}
+<div class="cultures-grid">
+    {% for culture in cultures %}
+    <div class="culture-card">
+        <div class="culture-icon">
+            {% if culture.nom == "Maïs" %}🌽
+            {% elif culture.nom == "Riz" %}🍚
+            {% elif culture.nom == "Tomate" %}🍅
+            {% elif culture.nom == "Manioc" %}🍠
+            {% elif culture.nom == "Soja" %}🫘
+            {% elif culture.nom == "Haricot" %}🫘
+            {% elif culture.nom == "Arachide" %}🥜
+            {% elif culture.nom == "Piment" %}🌶️
+            {% else %}🌱
+            {% endif %}
+        </div>
+        <h3>{{ culture.nom }}</h3>
+        <p class="culture-count">{{ culture.parcelles_associees.count }} parcelle(s)</p>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">🌽</div>
+    <h3>Aucune culture</h3>
+    <p>Les cultures seront préchargées dans le système.</p>
+</div>
+{% endif %}
+{% endblock %}

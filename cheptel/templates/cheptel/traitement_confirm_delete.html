@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="delete-container">
+        <div class="delete-card">
+            <div class="delete-icon">⚠️</div>
+            <h2>Confirmer la suppression</h2>
+            <p>
+                Êtes-vous sûr de vouloir supprimer ce traitement ?
+            </p>
+            
+            <div class="traitement-summary">
+                <div class="summary-item">
+                    <span class="label">🐄 Animal :</span>
+                    <span class="value">{{ object.animal.identifiant }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">📋 Type :</span>
+                    <span class="value">{{ object.get_type_display }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">📅 Date :</span>
+                    <span class="value">{{ object.date|date:"d/m/Y" }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">💊 Produit :</span>
+                    <span class="value">{{ object.produit.nom }}</span>
+                </div>
+                {% if object.dose %}
+                <div class="summary-item">
+                    <span class="label">💉 Dose :</span>
+                    <span class="value">{{ object.dose }}</span>
+                </div>
+                {% endif %}
+                {% if object.rappel_le %}
+                <div class="summary-item">
+                    <span class="label">⏰ Rappel :</span>
+                    <span class="value">{{ object.rappel_le|date:"d/m/Y" }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="alert alert-warning">
+                <strong>⚠️ Attention :</strong> Cette action est irréversible.
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="delete-actions">
+                    <button type="submit" class="btn btn-danger">
+                        🗑️ Oui, supprimer
+                    </button>
+                    <a href="{% url 'cheptel:traitement_list' %}" class="btn btn-secondary">
+                        ❌ Non, annuler
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+    
+    .delete-container {
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .delete-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        padding: 40px;
+        text-align: center;
+    }
+    
+    .delete-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+    }
+    
+    .delete-card h2 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+    }
+    
+    .delete-card p {
+        color: #7f8c8d;
+        margin-bottom: 25px;
+    }
+    
+    .traitement-summary {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+        text-align: left;
+    }
+    
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .summary-item:last-child {
+        border-bottom: none;
+    }
+    
+    .summary-item .label {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .summary-item .value {
+        color: #667eea;
+        font-weight: bold;
+    }
+    
+    .alert {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+    }
+    
+    .alert-warning {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+        text-align: left;
+    }
+    
+    .delete-actions {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .btn {
+        flex: 1;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        text-align: center;
+    }
+    
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-danger:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+        background: #f1f3f5;
+        color: #495057;
+    }
+    
+    .btn-secondary:hover {
+        background: #e9ecef;
+    }
+    
+    @media (max-width: 768px) {
+        .delete-card {
+            padding: 25px;
+        }
+        
+        .delete-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}

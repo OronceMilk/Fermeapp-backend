@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+        <h2 class="text-3xl font-black text-[#1e3a5f]">Gestion des Stocks</h2>
+        <p class="text-gray-500 text-sm mt-1">Inventaire des intrants et conservation des semences</p>
+    </div>
+    
+    <a href="{% url 'stocks:entree_create' %}"
+       class="bg-[#7cb518] hover:bg-[#689914] text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-transform transform active:scale-95 flex items-center gap-2">
+        <span>📦</span> Nouvelle Entrée
+    </a>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+    <div class="bg-white p-5 rounded-3xl shadow-sm border-l-4 border-red-500 flex items-center gap-4">
+        <div class="p-3 bg-red-50 rounded-full text-red-500 text-xl">⚠️</div>
+        <div>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Rupture imminente</p>
+            <p class="text-lg font-black text-[#1e3a5f]">{{ produits_en_alerte }} Produit{{ produits_en_alerte|pluralize }} à recommander</p>
+        </div>
+    </div>
+    <div class="bg-white p-5 rounded-3xl shadow-sm border-l-4 border-[#7cb518] flex items-center gap-4">
+        <div class="p-3 bg-green-50 rounded-full text-green-500 text-xl">🌱</div>
+        <div>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Produits suivis</p>
+            <p class="text-lg font-black text-[#1e3a5f]">{{ total_produits }} Produit{{ total_produits|pluralize }} enregistré{{ total_produits|pluralize }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="flex border-b border-gray-100 bg-gray-50/50 p-2 gap-2">
+        <button class="flex-1 py-3 px-4 text-sm font-bold text-[#1e3a5f] bg-white rounded-xl shadow-sm border border-gray-100 focus:outline-none transition"
+                hx-get="{% url 'stocks:aliments_partial' %}"
+                hx-target="#stock-content"
+                hx-swap="innerHTML">
+            💊 Aliments & Médicaments
+        </button>
+        <button class="flex-1 py-3 px-4 text-sm font-bold text-gray-500 hover:text-[#1e3a5f] hover:bg-white rounded-xl focus:outline-none transition"
+                hx-get="{% url 'stocks:semences_partial' %}"
+                hx-target="#stock-content"
+                hx-swap="innerHTML">
+            🌾 Banque de Semences
+        </button>
+    </div>
+
+    <div id="stock-content" class="p-0">
+        {% include 'stocks/aliments_table.html' %}
+    </div>
+</div>
+{% endblock %}

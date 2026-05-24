@@ -1,0 +1,314 @@
+/* static/css/stocks.css */
+
+/* Container principal */
+.stocks-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Page header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+.page-header h1 {
+    margin: 0;
+    color: #2c3e50;
+}
+
+/* Grille produits */
+.produits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* Carte produit */
+.produit-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+.produit-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+}
+
+.produit-header {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.produit-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+.produit-header.alerte {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+.produit-actions {
+    display: flex;
+    gap: 10px;
+}
+.produit-actions a {
+    color: white;
+    text-decoration: none;
+}
+
+.produit-body {
+    padding: 15px 20px;
+}
+.produit-body p {
+    margin: 8px 0;
+    color: #2c3e50;
+}
+.produit-quantite {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #3498db;
+    text-align: center;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+.produit-quantite.alerte {
+    color: #e74c3c;
+}
+
+.produit-footer {
+    background: #f8f9fa;
+    padding: 10px 20px;
+    border-top: 1px solid #e2e8f0;
+    text-align: right;
+}
+
+/* Liste des mouvements */
+.mouvements-table {
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.mouvements-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.mouvements-table th,
+.mouvements-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+.mouvements-table th {
+    background: #34495e;
+    color: white;
+    font-weight: 600;
+}
+.mouvements-table tr:hover {
+    background: #f8f9fa;
+}
+.entree {
+    color: #27ae60;
+    font-weight: bold;
+}
+.sortie {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* Filtres */
+.filters-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.filters-form {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+.filters-form .form-group {
+    flex: 1;
+    min-width: 150px;
+}
+.filters-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #2c3e50;
+}
+.filters-form input,
+.filters-form select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+.filter-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* États vides */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+}
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+.empty-state h3 {
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+}
+.empty-state p {
+    color: #7f8c8d;
+    margin-bottom: 20px;
+}
+
+/* Formulaires */
+.form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+.form-header {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    padding: 20px 30px;
+}
+.form-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+.form-header.entree {
+    background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+}
+.form-header.sortie {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+.form-group {
+    margin-bottom: 20px;
+    padding: 0 30px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+.form-actions {
+    padding: 20px 30px;
+    display: flex;
+    gap: 15px;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Boutons */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+.btn-primary {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+}
+.btn-success {
+    background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+    color: white;
+}
+.btn-danger {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+}
+.btn-secondary {
+    background: #95a5a6;
+    color: white;
+}
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+}
+.btn-icon {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 5px;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+.btn-page {
+    padding: 8px 15px;
+    background: white;
+    text-decoration: none;
+    color: #3498db;
+    border-radius: 6px;
+}
+.btn-page:hover {
+    background: #3498db;
+    color: white;
+}
+.page-current {
+    padding: 8px 15px;
+    background: #3498db;
+    color: white;
+    border-radius: 6px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .produits-grid {
+        grid-template-columns: 1fr;
+    }
+    .mouvements-table {
+        overflow-x: auto;
+    }
+    .filters-form {
+        flex-direction: column;
+    }
+    .filters-form .form-group {
+        width: 100%;
+    }
+    .form-actions {
+        flex-direction: column;
+    }
+}

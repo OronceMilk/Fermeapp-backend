@@ -1,0 +1,86 @@
+{% load static %}
+{% comment %}
+─────────────────────────────────────────────────────────────
+   templates/stocks/semences_table.html
+   Partial HTMX — inclus via hx-get ou {% include %}
+   Contexte attendu : semences (queryset)
+─────────────────────────────────────────────────────────────
+{% endcomment %}
+
+<div class="overflow-x-auto bg-white rounded-b-xl">
+  <table class="w-full text-left border-collapse">
+
+    <!-- En-tête -->
+    <thead>
+      <tr class="bg-white text-[10px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
+        <th class="p-4 font-bold">Espèce / Variété</th>
+        <th class="p-4 font-bold">Date de Collecte</th>
+        <th class="p-4 font-bold">Quantité</th>
+        <th class="p-4 font-bold">Taux de Germination</th>
+        <th class="p-4 font-bold text-right">Actions</th>
+      </tr>
+    </thead>
+
+    <!-- Corps -->
+    <tbody class="divide-y divide-gray-50">
+      {% for semence in semences %}
+      <tr class="hover:bg-gray-50 transition-colors">
+
+        <!-- Espèce / Variété -->
+        <td class="p-4">
+          <div class="font-bold text-navy">{{ semence.espece }}</div>
+          <div class="text-xs text-gray-400">{{ semence.variete }}</div>
+        </td>
+
+        <!-- Date de collecte -->
+        <td class="p-4 text-sm text-gray-600">
+          📅 {{ semence.date_collecte|date:"d/m/Y" }}
+        </td>
+
+        <!-- Quantité -->
+        <td class="p-4">
+          <span class="text-lg font-black text-navy">{{ semence.quantite }}</span>
+          <span class="text-xs text-gray-400 ml-1">{{ semence.unite }}</span>
+        </td>
+
+        <!-- Taux de germination -->
+        <td class="p-4">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-bold
+              {% if semence.taux_germination < 50 %}text-red-500{% else %}text-green-500{% endif %}">
+              {{ semence.taux_germination }}%
+            </span>
+            <div class="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div class="h-full rounded-full
+                {% if semence.taux_germination < 50 %}bg-red-500{% else %}bg-green-500{% endif %}"
+                style="width: {{ semence.taux_germination }}%;">
+              </div>
+            </div>
+          </div>
+        </td>
+
+        <!-- Actions -->
+        <td class="p-4 text-right">
+          <button
+            class="text-sm font-bold px-3 py-2 rounded-lg transition-colors
+                   text-blue-600 bg-blue-50 hover:bg-blue-100">
+            Tester Germination
+          </button>
+        </td>
+
+      </tr>
+      {% empty %}
+      <!-- Empty state -->
+      <tr>
+        <td colspan="5" class="p-10 text-center">
+          <div class="flex flex-col items-center gap-2">
+            <span class="text-3xl">🌱</span>
+            <p class="text-sm text-gray-400 italic">Aucune semence conservée pour le moment.</p>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+
+  </table>
+</div>

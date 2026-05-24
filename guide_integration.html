@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide d'intégration technique - FermeApp</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #7f8c8d;
+        }
+        .code-block {
+            background: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        .file-tree {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+        }
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #ccc;
+        }
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            margin: 10px 0;
+        }
+        .checklist input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 20px;
+            background-color: #4caf50;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .state-example {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .loading { background-color: #fff3cd; }
+        .success { background-color: #d4edda; }
+        .error { background-color: #f8d7da; }
+        .empty { background-color: #e2e3e5; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Guide d'intégration technique - FermeApp</h1>
+        <p><strong>Projet :</strong> Application de gestion de ferme avec frontend moderne</p>
+        <p><strong>Stack :</strong> Django Templates + Tailwind CSS + HTMX + Vanilla JS + Chart.js</p>
+
+        <h2>📁 Structure des fichiers</h2>
+        <div class="file-tree">
+FermeApp/
+├── templates/
+│   ├── base.html                    # Layout principal avec sidebar et topbar
+│   ├── accounts/
+│   │   └── login.html              # Page de connexion
+│   ├── dashboard/
+│   │   └── dashboard.html          # Dashboard admin avec KPIs et graphiques
+│   └── cheptel/
+│       ├── animal_list.html         # Liste des animaux avec filtres HTMX
+│       ├── animal_form.html         # Formulaire ajout/modification animal
+│       ├── traitement_list.html     # Historique sanitaire
+│       └── partials/
+│           ├── animal_table.html    # Tableau des animaux (HTMX)
+│           └── traitement_timeline.html # Timeline traitements
+├── static/
+│   ├── css/
+│   │   └── tailwind.css            # Styles Tailwind compilés
+│   └── js/
+│       ├── dashboard.js             # Graphiques Chart.js
+│       ├── notifications.js         # Système de toasts
+│       └── filters.js               # Gestion des filtres HTMX
+└── README.md                        # Documentation complète
+        </div>
+
+        <h2>⚙️ Configuration Django</h2>
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'settings')">settings.py</button>
+            <button class="tablinks" onclick="openTab(event, 'urls')">urls.py</button>
+            <button class="tablinks" onclick="openTab(event, 'context')">context_processors.py</button>
+        </div>
+
+        <div id="settings" class="tabcontent">
+            <h3>Configuration dans settings.py</h3>
+            <div class="code-block">
+# settings.py
+INSTALLED_APPS = [
+    # ... autres apps
+    'fermeapp',  # Votre app principale
+]
+
+# Configuration Tailwind CSS
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+# Configuration HTMX (optionnel mais recommandé)
+MIDDLEWARE = [
+    # ... autres middlewares
+    'django.middleware.csrf.CsrfViewMiddleware',
+]
+
+# Templates
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                # ... autres context processors
+                'fermeapp.context_processors.user_role',
+            ],
+        },
+    },
+]
+            </div>
+        </div>
+
+        <div id="urls" class="tabcontent">
+            <h3>Configuration des URLs</h3>
+            <div class="code-block">
+# urls.py (projet principal)
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('', include('fermeapp.urls')),
+]
+
+# fermeapp/urls.py
+from django.urls import path
+from . import views
+
+app_name = 'fermeapp'
+
+urlpatterns = [
+    path('', views.dashboard, name='dashboard'),
+    path('login/', views.login_view, name='login'),
+    path('cheptel/', views.animal_list, name='animal_list'),
+    path('cheptel/ajouter/', views.animal_form, name='animal_form'),
+    path('cheptel/&lt;int:pk&gt;/modifier/', views.animal_form, name='animal_edit'),
+    path('cheptel/&lt;int:pk&gt;/supprimer/', views.animal_delete, name='animal_delete'),
+    # HTMX endpoints
+    path('api/cheptel/filtrer/', views.filter_animals, name='filter_animals'),
+    path('api/traitements/', views.traitement_list, name='traitement_list'),
+]
+            </div>
+        </div>
+
+        <div id="context" class="tabcontent">
+            <h3>Context Processor pour les rôles</h3>
+            <div class="code-block">
+# fermeapp/context_processors.py
+def user_role(request):
+    """Ajoute le rôle de l'utilisateur au contexte des templates"""
+    if request.user.is_authenticated:
+        # Logique pour déterminer le rôle (ADMIN/EMPLOYÉ)
+        role = 'ADMIN' if request.user.is_superuser else 'EMPLOYÉ'
+        return {'user_role': role}
+    return {'user_role': None}
+            </div>
+        </div>
+
+        <h2>🔄 Patterns HTMX</h2>
+        <h3>1. Filtres dynamiques</h3>
+        <div class="code-block">
+&lt;!-- animal_list.html --&gt;
+&lt;select name="statut" 
+        hx-get="/api/cheptel/filtrer/" 
+        hx-target="#animal-table"
+        hx-include="[name='espece'],[name='lot'],[name='recherche']"
+        hx-indicator="#loading-indicator"&gt;
+    &lt;option value=""&gt;Tous les statuts&lt;/option&gt;
+    &lt;option value="actif"&gt;Actif&lt;/option&gt;
+    &lt;option value="malade"&gt;Malade&lt;/option&gt;
+&lt;/select&gt;
+        </div>
+
+        <h3>2. Détection HTMX dans les vues Django</h3>
+        <div class="code-block">
+# views.py
+def filter_animals(request):
+    # Logique de filtrage
+    animaux = Animal.objects.filter(...)
+    
+    if request.headers.get('HX-Request'):
+        # Retourner seulement le partial
+        return render(request, 'cheptel/partials/animal_table.html', {
+            'animaux': animaux
+        })
+    
+    # Retourner la page complète
+    return render(request, 'cheptel/animal_list.html', {
+        'animaux': animaux
+    })
+        </div>
+
+        <h3>3. Toasts via headers HTTP</h3>
+        <div class="code-block">
+# views.py
+def animal_form(request, pk=None):
+    if request.method == 'POST':
+        # Traitement du formulaire
+        if form.is_valid():
+            animal = form.save()
+            response = HttpResponse()
+            response['HX-Toast'] = f'Animal "{animal.nom}" créé ✅'
+            response['HX-Toast-Type'] = 'success'
+            response['HX-Redirect'] = reverse('animal_list')
+            return response
+    
+    # Formulaire invalide
+    response = render(request, 'cheptel/animal_form.html', {'form': form})
+    response['HX-Toast'] = 'Erreur dans le formulaire ❌'
+    response['HX-Toast-Type'] = 'error'
+    return response
+        </div>
+
+        <h2>📋 Référence rapide HTMX</h2>
+        <table>
+            <tr>
+                <th>Attribut</th>
+                <th>Description</th>
+                <th>Exemple</th>
+            </tr>
+            <tr>
+                <td>hx-get</td>
+                <td>Effectue une requête GET</td>
+                <td>hx-get="/api/data/"</td>
+            </tr>
+            <tr>
+                <td>hx-post</td>
+                <td>Effectue une requête POST</td>
+                <td>hx-post="/api/save/"</td>
+            </tr>
+            <tr>
+                <td>hx-target</td>
+                <td>Cible où injecter la réponse</td>
+                <td>hx-target="#content"</td>
+            </tr>
+            <tr>
+                <td>hx-include</td>
+                <td>Inclut des éléments dans la requête</td>
+                <td>hx-include="[name='filter']"</td>
+            </tr>
+            <tr>
+                <td>hx-indicator</td>
+                <td>Élément de chargement</td>
+                <td>hx-indicator="#spinner"</td>
+            </tr>
+            <tr>
+                <td>hx-swap</td>
+                <td>Comment remplacer le contenu</td>
+                <td>hx-swap="innerHTML"</td>
+            </tr>
+        </table>
+
+        <h2>🛠️ API JavaScript</h2>
+        <h3>1. dashboard.js</h3>
+        <div class="code-block">
+// Initialisation des graphiques
+function initCharts() { /* ... */ }
+
+// Mise à jour des données (7j/30j)
+function updateChartData(period) { /* ... */ }
+
+// Animation des cartes KPI
+function animateKPICards() { /* ... */ }
+        </div>
+
+        <h3>2. notifications.js</h3>
+        <div class="code-block">
+// Afficher un toast
+function showToast(message, type = 'info') { /* ... */ }
+
+// Types: 'success', 'error', 'warning', 'info'
+function showSuccessToast(message) { showToast(message, 'success'); }
+function showErrorToast(message) { showToast(message, 'error'); }
+        </div>
+
+        <h3>3. filters.js</h3>
+        <div class="code-block">
+// Synchronisation URL avec les filtres
+function syncFiltersWithURL() { /* ... */ }
+
+// Comptage des filtres actifs
+function updateActiveFiltersCount() { /* ... */ }
+
+// Highlight des filtres sélectionnés
+function highlightActiveFilters() { /* ... */ }
+        </div>
+
+        <h2>🎨 Les 4 états UI</h2>
+        <div class="state-example loading">
+            <h4>🔄 Loading State</h4>
+            <div class="code-block">
+&lt;div id="loading-indicator" class="htmx-indicator"&gt;
+    &lt;div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"&gt;&lt;/div&gt;
+    Chargement...
+&lt;/div&gt;
+            </div>
+        </div>
+
+        <div class="state-example success">
+            <h4>✅ Success State</h4>
+            <div class="code-block">
+&lt;div class="text-green-600 p-4 bg-green-50 rounded"&gt;
+    Opération réussie !
+&lt;/div&gt;
+            </div>
+        </div>
+
+        <div class="state-example error">
+            <h4>❌ Error State</h4>
+            <div class="code-block">
+&lt;div class="text-red-600 p-4 bg-red-50 rounded"&gt;
+    {% if form.errors %}
+        &lt;ul&gt;
+        {% for field, errors in form.errors.items %}
+            &lt;li&gt;{{ field }}: {{ errors|join:", " }}&lt;/li&gt;
+        {% endfor %}
+        &lt;/ul&gt;
+    {% endif %}
+&lt;/div&gt;
+            </div>
+        </div>
+
+        <div class="state-example empty">
+            <h4>📭 Empty State</h4>
+            <div class="code-block">
+&lt;div class="text-center py-12"&gt;
+    &lt;div class="text-gray-400 text-6xl mb-4"&gt;🐄&lt;/div&gt;
+    &lt;h3 class="text-lg font-medium text-gray-900 mb-2"&gt;Aucun animal&lt;/h3&gt;
+    &lt;p class="text-gray-500"&gt;Commencez par ajouter votre premier animal.&lt;/p&gt;
+    &lt;a href="{% url 'animal_form' %}" class="btn btn-primary"&gt;Ajouter un animal&lt;/a&gt;
+&lt;/div&gt;
+            </div>
+        </div>
+
+        <h2>✅ Checklist d'intégration</h2>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <ul class="checklist">
+            <li><input type="checkbox" id="step1" onchange="updateProgress()"> Créer la structure des dossiers</li>
+            <li><input type="checkbox" id="step2" onchange="updateProgress()"> Copier les templates HTML</li>
+            <li><input type="checkbox" id="step3" onchange="updateProgress()"> Ajouter les fichiers JavaScript</li>
+            <li><input type="checkbox" id="step4" onchange="updateProgress()"> Configurer Django (settings.py, urls.py)</li>
+            <li><input type="checkbox" id="step5" onchange="updateProgress()"> Créer les vues Django</li>
+            <li><input type="checkbox" id="step6" onchange="updateProgress()"> Intégrer Tailwind CSS</li>
+            <li><input type="checkbox" id="step7" onchange="updateProgress()"> Tester les endpoints HTMX</li>
+            <li><input type="checkbox" id="step8" onchange="updateProgress()"> Configurer les modèles Django</li>
+            <li><input type="checkbox" id="step9" onchange="updateProgress()"> Ajouter la gestion des rôles</li>
+            <li><input type="checkbox" id="step10" onchange="updateProgress()"> Déploiement et tests finaux</li>
+        </ul>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.checklist input[type="checkbox"]');
+            const checked = document.querySelectorAll('.checklist input[type="checkbox"]:checked');
+            const progress = (checked.length / checkboxes.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+
+        // Initialize with first tab open
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.tablinks').click();
+            updateProgress();
+        });
+    </script>
+</body>
+</html>

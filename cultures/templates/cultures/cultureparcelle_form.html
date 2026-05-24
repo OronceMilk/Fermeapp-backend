@@ -1,0 +1,96 @@
+<!-- cultures/templates/cultures/cultureparcelle_form.html -->
+{% extends 'cultures/base_cultures.html' %}
+
+{% block cultures_content %}
+<div class="form-container">
+    <div class="form-header">
+        <h1>{{ title }}</h1>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="{{ form.parcelle.id_for_label }}">Parcelle *</label>
+                {{ form.parcelle }}
+                {% if form.parcelle.errors %}
+                    <small class="text-danger">{{ form.parcelle.errors.0 }}</small>
+                {% endif %}
+            </div>
+            
+            <div class="form-group col-md-6">
+                <label for="{{ form.culture.id_for_label }}">Culture *</label>
+                {{ form.culture }}
+                {% if form.culture.errors %}
+                    <small class="text-danger">{{ form.culture.errors.0 }}</small>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="{{ form.date_semis.id_for_label }}">Date de semis *</label>
+                {{ form.date_semis }}
+                {% if form.date_semis.errors %}
+                    <small class="text-danger">{{ form.date_semis.errors.0 }}</small>
+                {% endif %}
+            </div>
+            
+            <div class="form-group col-md-6">
+                <label for="{{ form.date_recolte_prevue.id_for_label }}">Date de récolte prévue</label>
+                {{ form.date_recolte_prevue }}
+                {% if form.date_recolte_prevue.errors %}
+                    <small class="text-danger">{{ form.date_recolte_prevue.errors.0 }}</small>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="{{ form.date_recolte_reelle.id_for_label }}">Date de récolte réelle</label>
+                {{ form.date_recolte_reelle }}
+                {% if form.date_recolte_reelle.errors %}
+                    <small class="text-danger">{{ form.date_recolte_reelle.errors.0 }}</small>
+                {% endif %}
+                <small class="form-text">À renseigner après la récolte</small>
+            </div>
+            
+            <div class="form-group col-md-6">
+                <label for="{{ form.rendement.id_for_label }}">Rendement (kg)</label>
+                {{ form.rendement }}
+                {% if form.rendement.errors %}
+                    <small class="text-danger">{{ form.rendement.errors.0 }}</small>
+                {% endif %}
+                <small class="form-text">Production totale en kg</small>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.notes.id_for_label }}">Notes</label>
+            {{ form.notes }}
+            {% if form.notes.errors %}
+                <small class="text-danger">{{ form.notes.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text">Informations complémentaires sur la culture</small>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                💾 Enregistrer
+            </button>
+            <a href="{% url 'cultures:cultureparcelle_list' %}" class="btn btn-secondary">
+                ❌ Annuler
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+        <h2 class="text-3xl font-black text-[#1e3a5f]">Suivi des Tâches</h2>
+        <p class="text-gray-500 text-sm mt-1">Organisation du travail et assignation des employés (Kanban)</p>
+    </div>
+    
+    <button hx-get="/taches/add/" 
+            hx-target="#modal-container"
+            class="admin-only bg-[#7cb518] hover:bg-[#689914] text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-transform transform active:scale-95 flex items-center gap-2">
+        <span>📝</span> Créer une Tâche
+    </button>
+</div>
+
+<div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-8 flex flex-wrap gap-4 items-center">
+    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Filtrer par :</span>
+    
+    <form hx-get="/taches/" hx-target="#kanban-board" hx-trigger="change" class="flex gap-4 w-full md:w-auto">
+        <select name="employe" class="bg-gray-50 border border-gray-200 text-[#1e3a5f] text-sm rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-[#7cb518]">
+            <option value="">Tous les employés</option>
+            {% for employe in employes %}
+            <option value="{{ employe.id }}">{{ employe.username }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="priorite" class="bg-gray-50 border border-gray-200 text-[#1e3a5f] text-sm rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-[#7cb518]">
+            <option value="">Toutes les priorités</option>
+            <option value="HAUTE">🔴 Haute</option>
+            <option value="MOYENNE">🟠 Moyenne</option>
+            <option value="BASSE">🟢 Basse</option>
+        </select>
+    </form>
+</div>
+
+<div id="kanban-board">
+    {% include 'taches/partials/kanban_board.html' %}
+</div>
+
+<div id="modal-container"></div>
+{% endblock %}

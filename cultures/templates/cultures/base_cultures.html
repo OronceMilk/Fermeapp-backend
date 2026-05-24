@@ -1,0 +1,63 @@
+<!-- cultures/templates/cultures/base_cultures.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/cultures.css' %}">
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sub-nav {
+        background: #34495e;
+        padding: 10px 20px;
+        margin-bottom: 30px;
+        border-radius: 8px;
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    .sub-nav a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        transition: background 0.3s;
+    }
+    .sub-nav a:hover {
+        background: #2c3e50;
+    }
+    .sub-nav a.active {
+        background: #1abc9c;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cultures-container">
+    <div class="sub-nav">
+        <a href="{% url 'cultures:parcelle_list' %}" class="{% if request.resolver_match.url_name == 'parcelle_list' %}active{% endif %}">
+            🌾 Parcelles
+        </a>
+        <a href="{% url 'cultures:culture_list' %}" class="{% if request.resolver_match.url_name == 'culture_list' %}active{% endif %}">
+            🌽 Cultures
+        </a>
+        <a href="{% url 'cultures:cultureparcelle_list' %}" class="{% if request.resolver_match.url_name == 'cultureparcelle_list' %}active{% endif %}">
+            🔗 Associations
+        </a>
+        <a href="{% url 'cultures:activite_list' %}" class="{% if request.resolver_match.url_name == 'activite_list' %}active{% endif %}">
+            📝 Activités
+        </a>
+    </div>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    {% block cultures_content %}{% endblock %}
+</div>
+{% endblock %}

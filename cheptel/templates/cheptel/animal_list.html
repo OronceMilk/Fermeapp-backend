@@ -1,0 +1,308 @@
+<!-- cheptel/templates/cheptel/animal_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}Animaux - {{ ferme.nom }}{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Cheptel</span>
+</li>
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Animaux</span>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>🐄 Gestion des Animaux</h1>
+        <p>Ferme : <strong>{{ request.user.ferme.nom }}</strong></p>
+        <a href="{% url 'cheptel:animal_add' %}" class="btn-primary">+ Ajouter un animal</a>
+    </div>
+    
+    <!-- 📊 STATISTIQUES -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>📊 Total</h3>
+            <p class="stat-number">{{ stats.total }}</p>
+        </div>
+        <div class="stat-card actif">
+            <h3>✅ Actifs</h3>
+            <p class="stat-number">{{ stats.actif }}</p>
+        </div>
+        <div class="stat-card decede">
+            <h3>💀 Décédés</h3>
+            <p class="stat-number">{{ stats.decede }}</p>
+        </div>
+        <div class="stat-card vendu">
+            <h3>💰 Vendus</h3>
+            <p class="stat-number">{{ stats.vendu }}</p>
+        </div>
+    </div>
+    
+    <!-- 🔍 FILTRES -->
+    <div class="filters">
+        <form method="get" class="filter-form">
+            <div class="filter-group">
+                <label>Statut :</label>
+                <select name="statut">
+                    <option value="">Tous</option>
+                    <option value="ACTIF" {% if statut_filter == 'ACTIF' %}selected{% endif %}>Actif</option>
+                    <option value="DECEDE" {% if statut_filter == 'DECEDE' %}selected{% endif %}>Décédé</option>
+                    <option value="VENDU" {% if statut_filter == 'VENDU' %}selected{% endif %}>Vendu</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Espèce :</label>
+                <select name="espece">
+                    <option value="">Toutes</option>
+                    {% for espece in especes %}
+                    <option value="{{ espece.id }}" {% if espece_filter|add:0 == espece.id %}selected{% endif %}>
+                        {{ espece.nom }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>Lot :</label>
+                <select name="lot">
+                    <option value="">Tous</option>
+                    {% for lot in lots %}
+                    <option value="{{ lot.id }}" {% if lot_filter|add:0 == lot.id %}selected{% endif %}>
+                        {{ lot.nom }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-filter">🔍 Filtrer</button>
+            <a href="{% url 'cheptel:animal_list' %}" class="btn-reset">↺ Réinitialiser</a>
+        </form>
+    </div>
+    
+    <!-- 📋 LISTE DES ANIMAUX -->
+    <div class="animal-grid">
+        {% if animaux %}
+            {% for animal in animaux %}
+            <div class="animal-card statut-{{ animal.statut|lower }}">
+                <div class="animal-header">
+                    <div>
+                        <h3>{{ animal.identifiant }}</h3>
+                        <p class="animal-nom">{{ animal.nom|default:"Sans nom" }}</p>
+                    </div>
+                    <span class="badge {{ animal.statut|lower }}">{{ animal.get_statut_display }}</span>
+                </div>
+                
+                {% if animal.photo %}
+                <div class="animal-photo">
+                    <img src="{{ animal.photo.url }}" alt="{{ animal.identifiant }}">
+                </div>
+                {% endif %}
+                
+                <div class="animal-info">
+                    <p><strong>Espèce :</strong> {{ animal.espece.nom }}</p>
+                    <p><strong>Sexe :</strong> {{ animal.get_sexe_display }}</p>
+                    <p><strong>Race :</strong> {{ animal.race|default:"Non renseignée" }}</p>
+                    <p><strong>Date naissance :</strong> {{ animal.date_naissance|date:"d/m/Y"|default:"Non renseignée" }}</p>
+                    <p><strong>Date arrivée :</strong> {{ animal.date_arrivee|date:"d/m/Y" }}</p>
+                    {% if animal.lot %}
+                    <p><strong>Lot :</strong> {{ animal.lot.nom }}</p>
+                    {% endif %}
+                </div>
+                <div class="animal-actions">
+                    <a href="{% url 'cheptel:animal_edit' animal.pk %}" class="btn-edit">✏️ Modifier</a>
+                    {% if request.user.role == "ADMIN" %}
+                        <a href="{% url 'cheptel:animal_delete' animal.pk %}" class="btn-delete" onclick="return confirm('Supprimer cet animal ?')">🗑️ Supprimer</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state py-8">
+                <p>🐔 Aucun animal dans cette ferme.</p>
+                <a href="{% url 'cheptel:animal_add' %}" class="btn-primary">Ajouter votre premier animal</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card.actif { border-left: 4px solid #28a745; }
+    .stat-card.decede { border-left: 4px solid #dc3545; }
+    .stat-card.vendu { border-left: 4px solid #ffc107; }
+    
+    .stat-number {
+        font-size: 32px;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+    
+    .filters {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+    }
+    
+    .filter-form {
+        display: flex;
+        gap: 20px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+    
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .filter-group select {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    
+    .btn-primary, .btn-filter, .btn-reset, .btn-edit, .btn-delete {
+        padding: 8px 16px;
+        border-radius: 5px;
+        text-decoration: none;
+        display: inline-block;
+        cursor: pointer;
+        border: none;
+    }
+    
+    .btn-primary {
+        background: #007bff;
+        color: white;
+    }
+    
+    .btn-filter {
+        background: #28a745;
+        color: white;
+    }
+    
+    .btn-reset {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-edit {
+        background: #ffc107;
+        color: #333;
+    }
+    
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .animal-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+    }
+    
+    .animal-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-left: 4px solid #28a745;
+    }
+    
+    .animal-card.statut-decede { border-left-color: #dc3545; }
+    .animal-card.statut-vendu { border-left-color: #ffc107; }
+    
+    .animal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
+    
+    .animal-header h3 {
+        margin: 0;
+        color: #333;
+    }
+    
+    .animal-nom {
+        color: #666;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    
+    .animal-photo {
+        margin-bottom: 15px;
+        text-align: center;
+    }
+    
+    .animal-photo img {
+        max-width: 100%;
+        max-height: 150px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+    
+    .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    
+    .badge.actif { background: #28a745; color: white; }
+    .badge.decede { background: #dc3545; color: white; }
+    .badge.vendu { background: #ffc107; color: #333; }
+    
+    .animal-info p {
+        margin: 8px 0;
+        font-size: 14px;
+    }
+    
+    .animal-actions {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px;
+        background: white;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}

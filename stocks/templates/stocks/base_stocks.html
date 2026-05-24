@@ -1,0 +1,73 @@
+<!-- stocks/templates/stocks/base_stocks.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/stocks.css' %}">
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sub-nav {
+        background: #34495e;
+        padding: 10px 20px;
+        margin-bottom: 30px;
+        border-radius: 8px;
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    .sub-nav a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        transition: background 0.3s;
+    }
+    .sub-nav a:hover {
+        background: #2c3e50;
+    }
+    .sub-nav a.active {
+        background: #1abc9c;
+    }
+    .alert-badge {
+        background: #e74c3c;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 8px;
+        font-size: 0.7rem;
+        margin-left: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stocks-container">
+    <div class="sub-nav">
+        <a href="{% url 'stocks:produit_list' %}" class="{% if request.resolver_match.url_name == 'produit_list' %}active{% endif %}">
+            📦 Produits
+        </a>
+        <a href="{% url 'stocks:mouvement_list' %}" class="{% if request.resolver_match.url_name == 'mouvement_list' %}active{% endif %}">
+            📊 Mouvements
+        </a>
+        {% if request.user.role == "ADMIN" %}
+        <a href="{% url 'stocks:entree_create' %}" class="{% if request.resolver_match.url_name == 'entree_create' %}active{% endif %}">
+            📥 Entrée
+        </a>
+        <a href="{% url 'stocks:sortie_create' %}" class="{% if request.resolver_match.url_name == 'sortie_create' %}active{% endif %}">
+            📤 Sortie
+        </a>
+        {% endif %}
+    </div>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    {% block stocks_content %}{% endblock %}
+</div>
+{% endblock %}

@@ -1,0 +1,191 @@
+<!-- cultures/templates/cultures/activite_list.html -->
+{% extends 'cultures/base_cultures.html' %}
+
+{% block cultures_content %}
+<div class="page-header">
+    <h1>📝 Activités agricoles</h1>
+    {% if request.user.role == "ADMIN" %}
+    <a href="{% url 'cultures:activite_create' %}" class="btn btn-primary">
+        ➕ Nouvelle activité
+    </a>
+    {% endif %}
+</div>
+
+{% if activites %}
+<div class="activites-list">
+    {% for activite in activites %}
+    <div class="activite-card">
+        <div class="activite-info">
+            <div class="activite-type {{ activite.type }}">
+                {% if activite.type == "LABOUR" %}🚜 Labour
+                {% elif activite.type == "SEMIS" %}🌱 Semis
+                {% elif activite.type == "IRRIGATION" %}💧 Irrigation
+                {% elif activite.type == "FERTILISATION" %}🌾 Fertilisation
+                {% elif activite.type == "DESHERBAGE" %}🌿 Désherbage
+                {% elif activite.type == "RECOLTE" %}🚜 Récolte
+                {% else %}📋 {{ activite.get_type_display }}
+                {% endif %}
+            </div>
+            <div class="activite-detail">
+                📍 {{ activite.culture_parcelle.culture.nom }} sur {{ activite.culture_parcelle.parcelle.nom }}
+            </div>
+            {% if activite.description %}
+            <div class="activite-detail">
+                📝 {{ activite.description|truncatechars:100 }}
+            </div>
+            {% endif %}
+            {% if activite.intrants_utilises %}
+            <div class="activite-detail">
+                🧪 Intrants : {{ activite.intrants_utilises }}
+            </div>
+            {% endif %}
+            <div class="activite-detail">
+                👤 {{ activite.operateur.get_full_name|default:activite.operateur.username }}
+            </div>
+        </div>
+        <div class="activite-date">
+            <div>{{ activite.date|date:"d/m/Y" }}</div>
+            {% if request.user.role == "ADMIN" %}
+            <div class="activite-actions">
+                <a href="#" class="btn-icon delete" 
+                   onclick="if(confirm('Supprimer cette activité ?')) 
+                           document.getElementById('delete-form-{{ activite.id }}').submit();"
+                   title="Supprimer">🗑️</a>
+                <form id="delete-form-{{ activite.id }}" 
+                      method="post" 
+                      action="{% url 'cultures:activite_delete' activite.pk %}" 
+                      style="display: none;">
+                    {% csrf_token %}
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1" class="btn-page">« Première</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn-page">‹ Précédente</a>
+    {% endif %}
+    
+    <span class="page-current">
+        Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+    </span>
+    
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="btn-page">Suivante ›</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="btn-page">Dernière »</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">📝</div>
+    <h3>Aucune activité</h3>
+    <p>Enregistrez vos premières activités agricoles.</p>
+    {% if request.user.role == "ADMIN" %}
+    <a href="{% url 'cultures:activite_create' %}" class="btn btn-primary">
+        ➕ Créer une activité
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
+<style>
+    .activite-card {
+        background: white;
+        border-radius: 12px;
+        padding: 15px 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        transition: transform 0.2s;
+    }
+    .activite-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+    }
+    .activite-info {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        flex: 1;
+    }
+    .activite-type {
+        font-weight: bold;
+        font-size: 1rem;
+    }
+    .activite-type.LABOUR { color: #8e44ad; }
+    .activite-type.SEMIS { color: #27ae60; }
+    .activite-type.IRRIGATION { color: #3498db; }
+    .activite-type.FERTILISATION { color: #e67e22; }
+    .activite-type.DESHERBAGE { color: #1abc9c; }
+    .activite-type.RECOLTE { color: #f39c12; }
+    .activite-detail {
+        color: #7f8c8d;
+        font-size: 0.85rem;
+    }
+    .activite-date {
+        color: #95a5a6;
+        font-size: 0.8rem;
+        text-align: right;
+        min-width: 100px;
+    }
+    .activite-actions {
+        margin-top: 8px;
+    }
+    .btn-icon {
+        background: none;
+        border: none;
+        font-size: 1.1rem;
+        cursor: pointer;
+        padding: 5px;
+        text-decoration: none;
+    }
+    .btn-icon.delete {
+        color: #e74c3c;
+    }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+    .btn-page {
+        padding: 8px 15px;
+        background: white;
+        text-decoration: none;
+        color: #27ae60;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+    .btn-page:hover {
+        background: #27ae60;
+        color: white;
+    }
+    .page-current {
+        padding: 8px 15px;
+        background: #27ae60;
+        color: white;
+        border-radius: 6px;
+    }
+    @media (max-width: 768px) {
+        .activite-card {
+            flex-direction: column;
+            text-align: center;
+        }
+        .activite-date {
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}

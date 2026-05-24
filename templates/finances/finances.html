@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+        <h2 class="text-3xl font-black text-[#1e3a5f]">Finances & Rentabilité</h2>
+        <p class="text-gray-500 text-sm mt-1">Suivi des recettes, dépenses et calcul du bénéfice net</p>
+    </div>
+    
+    <button hx-get="/finances/add/" 
+            hx-target="#modal-container"
+            class="admin-only bg-[#1e3a5f] hover:bg-[#2a5285] text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-transform transform active:scale-95 flex items-center gap-2">
+        <span>💸</span> Ajouter une Transaction
+    </button>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white p-6 rounded-3xl shadow-sm border-l-4 border-[#7cb518]">
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Recettes (Ce mois)</p>
+        <p class="text-3xl font-black text-[#7cb518] mt-2">1 450 000 <span class="text-sm">FCFA</span></p>
+    </div>
+    <div class="bg-white p-6 rounded-3xl shadow-sm border-l-4 border-red-500">
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Dépenses (Ce mois)</p>
+        <p class="text-3xl font-black text-red-500 mt-2">820 000 <span class="text-sm">FCFA</span></p>
+    </div>
+    <div class="bg-white p-6 rounded-3xl shadow-sm border-l-4 border-blue-500">
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Bénéfice Net</p>
+        <p class="text-3xl font-black text-[#1e3a5f] mt-2">+ 630 000 <span class="text-sm">FCFA</span></p>
+    </div>
+</div>
+
+<div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 mb-8">
+    <div class="flex justify-between items-center mb-6">
+        <h3 class="font-bold text-[#1e3a5f]">Recettes vs Dépenses (Année en cours)</h3>
+        <select class="bg-gray-50 border border-gray-200 text-sm rounded-lg px-3 py-1 outline-none">
+            <option>2026</option>
+            <option>2025</option>
+        </select>
+    </div>
+    <div class="h-72">
+        <canvas id="financesChart"></canvas>
+    </div>
+</div>
+
+<div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+        <h3 class="font-bold text-[#1e3a5f]">Journal des Transactions</h3>
+        <span class="text-xs font-bold text-gray-400 bg-gray-50 px-3 py-1 rounded-full">30 derniers jours</span>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50 text-[10px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                    <th class="p-4 font-bold">Date</th>
+                    <th class="p-4 font-bold">Type</th>
+                    <th class="p-4 font-bold">Catégorie</th>
+                    <th class="p-4 font-bold">Description</th>
+                    <th class="p-4 font-bold text-right">Montant (FCFA)</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+                {% for transaction in transactions %}
+                <tr class="hover:bg-gray-50/50 transition">
+                    <td class="p-4 text-sm font-bold text-[#1e3a5f]">{{ transaction.date|date:"d/m/Y" }}</td>
+                    <td class="p-4">
+                        {% if transaction.type == 'RECETTE' %}
+                            <span class="bg-green-100 text-green-800 text-[10px] font-bold uppercase px-3 py-1 rounded-full flex items-center w-max gap-1">
+                                <span>📈</span> Recette
+                            </span>
+                        {% else %}
+                            <span class="bg-red-100 text-red-800 text-[10px] font-bold uppercase px-3 py-1 rounded-full flex items-center w-max gap-1">
+                                <span>📉</span> Dépense
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="p-4 text-sm text-gray-600">{{ transaction.categorie }}</td>
+                    <td class="p-4 text-sm text-gray-500 italic">{{ transaction.description }}</td>
+                    <td class="p-4 text-right">
+                        <span class="text-lg font-black {% if transaction.type == 'RECETTE' %}text-[#7cb518]{% else %}text-red-500{% endif %}">
+                            {% if transaction.type == 'RECETTE' %}+{% else %}-{% endif %} {{ transaction.montant }}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="p-8 text-center text-gray-400 italic">Aucune transaction enregistrée.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="modal-container"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/finances.js"></script>
+{% endblock %}

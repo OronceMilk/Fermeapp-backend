@@ -1,0 +1,133 @@
+<!-- stocks/templates/stocks/mouvement_form.html -->
+{% extends 'stocks/base_stocks.html' %}
+
+{% block stocks_content %}
+{% block breadcrumb_items %}
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Exploitation</span>
+</li>
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Stocks</span>
+</li>
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">{% if type_mouvement == 'ENTREE' %}Entrée{% else %}Sortie{% endif %}</span>
+</li>
+{% endblock %}
+<div class="form-container">
+    <div class="form-header {% if type_mouvement == 'ENTREE' %}entree{% else %}sortie{% endif %}">
+        <h1>{{ title }}</h1>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="form-group">
+            <label for="{{ form.produit.id_for_label }}">Produit *</label>
+            {{ form.produit }}
+            {% if form.produit.errors %}
+                <small class="text-danger">{{ form.produit.errors.0 }}</small>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.quantite.id_for_label }}">Quantité *</label>
+            {{ form.quantite }}
+            {% if form.quantite.errors %}
+                <small class="text-danger">{{ form.quantite.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text">Saisir une valeur positive</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.date.id_for_label }}">Date *</label>
+            {{ form.date }}
+            {% if form.date.errors %}
+                <small class="text-danger">{{ form.date.errors.0 }}</small>
+            {% endif %}
+        </div>
+        
+        {% if type_mouvement == 'ENTREE' %}
+        <div class="form-group">
+            <label for="{{ form.prix_unitaire.id_for_label }}">Prix unitaire (CFA)</label>
+            {{ form.prix_unitaire }}
+            {% if form.prix_unitaire.errors %}
+                <small class="text-danger">{{ form.prix_unitaire.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text">Optionnel - Pour le calcul financier du dashboard</small>
+        </div>
+        {% endif %}
+        
+        <div class="form-group">
+            <label for="{{ form.reference.id_for_label }}">Référence</label>
+            {{ form.reference }}
+            {% if form.reference.errors %}
+                <small class="text-danger">{{ form.reference.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text">
+                {% if type_mouvement == 'ENTREE' %}
+                N° de facture, bon de commande...
+                {% else %}
+                Bon de sortie, destination...
+                {% endif %}
+            </small>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.motif.id_for_label }}">Motif</label>
+            {{ form.motif }}
+            {% if form.motif.errors %}
+                <small class="text-danger">{{ form.motif.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text">
+                {% if type_mouvement == 'ENTREE' %}
+                Raison de l'approvisionnement (ex: réapprovisionnement mensuel)
+                {% else %}
+                Raison de la consommation (ex: alimentation animaux, traitement vétérinaire)
+                {% endif %}
+            </small>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn {% if type_mouvement == 'ENTREE' %}btn-success{% else %}btn-danger{% endif %}">
+                💾 Enregistrer
+            </button>
+            <a href="{% url 'stocks:mouvement_list' %}" class="btn btn-secondary">
+                ❌ Annuler
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .text-danger {
+        color: #e74c3c;
+        font-size: 0.75rem;
+        display: block;
+        margin-top: 5px;
+    }
+    .form-text {
+        font-size: 0.75rem;
+        color: #7f8c8d;
+        margin-top: 5px;
+        display: block;
+    }
+    .alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 6px;
+        margin: 0 30px 20px 30px;
+    }
+</style>
+{% endblock %}

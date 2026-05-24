@@ -1,0 +1,148 @@
+<!-- accounts/templates/accounts/admin_dashboard.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Gestion Ferme</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar h2 {
+            font-size: 20px;
+        }
+        
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        
+        .navbar a:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .info-item {
+            padding: 10px;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .menu-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .menu-link {
+            display: block;
+            background: #f0f0f0;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s;
+        }
+        
+        .menu-link:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h2>🐔 Dashboard Administrateur</h2>
+        <a href="{% url 'accounts:logout' %}">🚪 Déconnexion</a>
+    </div>
+    
+    <div class="container">
+        <div class="card">
+            <h3>👋 Bonjour, {{ user.get_full_name|default:user.username }}</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Rôle</div>
+                    <div>Administrateur</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Ferme</div>
+                    <div>{{ ferme.nom }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Email</div>
+                    <div>{{ user.email }}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Localisation</div>
+                    <div>{{ ferme.localisation|default:"Non renseignée" }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3>📋 Menu de gestion</h3>
+            <div class="menu-links">
+                <a href="/admin/" class="menu-link">⚙️ Interface Admin Django</a>
+                <a href="#" class="menu-link">🐄 Gestion des animaux</a>
+                <a href="#" class="menu-link">🥚 Comptages d'œufs</a>
+                <a href="#" class="menu-link">💊 Traitements</a>
+                <a href="#" class="menu-link">👥 Gestion des utilisateurs</a>
+                <a href="#" class="menu-link">📊 Statistiques</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!-- cultures/templates/cultures/parcelle_list.html -->
+{% extends 'cultures/base_cultures.html' %}
+
+{% block cultures_content %}
+{% block breadcrumb_items %}
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Exploitation</span>
+</li>
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Cultures</span>
+</li>
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Parcelles</span>
+</li>
+{% endblock %}
+<div class="page-header">
+    <h1>🌾 Mes parcelles</h1>
+    {% if request.user.role == "ADMIN" %}
+    <a href="{% url 'cultures:parcelle_create' %}" class="btn btn-primary">
+        ➕ Nouvelle parcelle
+    </a>
+    {% endif %}
+</div>
+
+{% if parcelles %}
+<div class="parcelles-grid">
+    {% for parcelle in parcelles %}
+    <div class="parcelle-card">
+        <div class="parcelle-header">
+            <h3>{{ parcelle.nom }}</h3>
+            {% if request.user.role == "ADMIN" %}
+            <div class="parcelle-actions">
+                <a href="{% url 'cultures:parcelle_update' parcelle.pk %}" class="btn-icon" title="Modifier">✏️</a>
+                <a href="{% url 'cultures:parcelle_delete' parcelle.pk %}" class="btn-icon delete" title="Supprimer">🗑️</a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="parcelle-body">
+            <p><strong>📐 Superficie :</strong> {{ parcelle.superficie }} ha</p>
+            <p><strong>🌱 Type de sol :</strong> {{ parcelle.type_sol|default:"Non renseigné" }}</p>
+            <p><strong>📍 Localisation :</strong> {{ parcelle.localisation|default:"Non renseignée" }}</p>
+        </div>
+        <div class="parcelle-footer">
+            <span class="badge">{{ parcelle.cultures_count }} culture(s)</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">🌾</div>
+    <h3>Aucune parcelle</h3>
+    <p>Commencez par créer votre première parcelle.</p>
+    {% if request.user.role == "ADMIN" %}
+    <a href="{% url 'cultures:parcelle_create' %}" class="btn btn-primary">
+        ➕ Créer une parcelle
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

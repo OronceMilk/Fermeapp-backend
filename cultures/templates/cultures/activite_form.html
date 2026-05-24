@@ -1,0 +1,116 @@
+<!-- cultures/templates/cultures/activite_form.html -->
+{% extends 'cultures/base_cultures.html' %}
+
+{% block cultures_content %}
+{% block breadcrumb_items %}
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Exploitation</span>
+</li>
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Cultures</span>
+</li>
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Activités</span>
+</li>
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Nouvelle activité</span>
+</li>
+{% endblock %}
+<div class="form-container">
+    <div class="form-header">
+        <h1>{{ title }}</h1>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="form-group">
+            <label for="{{ form.culture_parcelle.id_for_label }}">Culture / Parcelle *</label>
+            {{ form.culture_parcelle }}
+            {% if form.culture_parcelle.errors %}
+                <small class="text-danger">{{ form.culture_parcelle.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text">Sélectionnez la culture associée à une parcelle</small>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="{{ form.type.id_for_label }}">Type d'activité *</label>
+                {{ form.type }}
+                {% if form.type.errors %}
+                    <small class="text-danger">{{ form.type.errors.0 }}</small>
+                {% endif %}
+            </div>
+            
+            <div class="form-group col-md-6">
+                <label for="{{ form.date.id_for_label }}">Date *</label>
+                {{ form.date }}
+                {% if form.date.errors %}
+                    <small class="text-danger">{{ form.date.errors.0 }}</small>
+                {% endif %}
+                <small class="form-text">Date de réalisation de l'activité</small>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.intrants_utilises.id_for_label }}">Intrants utilisés</label>
+            {{ form.intrants_utilises }}
+            {% if form.intrants_utilises.errors %}
+                <small class="text-danger">{{ form.intrants_utilises.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text">Ex: Engrais NPK 15-15-15 (50kg), Pesticide X (2L)</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}">Description</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+                <small class="text-danger">{{ form.description.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text">Détails supplémentaires sur l'activité réalisée</small>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                💾 Enregistrer l'activité
+            </button>
+            <a href="{% url 'cultures:activite_list' %}" class="btn btn-secondary">
+                ❌ Annuler
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* Styles spécifiques au formulaire si nécessaire */
+    select.form-control, input.form-control, textarea.form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        font-family: inherit;
+    }
+    select.form-control:focus, input.form-control:focus, textarea.form-control:focus {
+        outline: none;
+        border-color: #27ae60;
+        box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+    }
+    textarea.form-control {
+        resize: vertical;
+        min-height: 80px;
+    }
+</style>
+{% endblock %}

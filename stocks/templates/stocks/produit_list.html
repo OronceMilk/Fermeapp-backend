@@ -1,0 +1,106 @@
+<!-- stocks/templates/stocks/produit_list.html -->
+{% extends 'stocks/base_stocks.html' %}
+
+{% block stocks_content %}
+{% block breadcrumb_items %}
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Exploitation</span>
+</li>
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Stocks</span>
+</li>
+{% endblock %}
+<div class="page-header">
+    <h1>📦 Gestion des stocks</h1>
+    {% if request.user.role == "ADMIN" %}
+    <a href="{% url 'stocks:produit_create' %}" class="btn btn-primary">
+        ➕ Nouveau produit
+    </a>
+    {% endif %}
+</div>
+
+<!-- Filtre alerte -->
+<div class="filters-card">
+    <form method="get" class="filters-form">
+        <div class="form-group">
+            <label for="alerte">Filtre</label>
+            <select name="alerte" id="alerte" class="form-control">
+                <option value="">Tous les produits</option>
+                <option value="1" {% if request.GET.alerte == '1' %}selected{% endif %}>
+                    ⚠️ Produits en alerte
+                </option>
+            </select>
+        </div>
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-primary">Filtrer</button>
+            <a href="{% url 'stocks:produit_list' %}" class="btn btn-secondary">Réinitialiser</a>
+        </div>
+    </form>
+</div>
+
+{% if produits %}
+<div class="produits-grid">
+    {% for produit in produits %}
+    <div class="produit-card">
+        <div class="produit-header {% if produit.est_en_alerte %}alerte{% endif %}">
+            <h3>{{ produit.nom }}</h3>
+            {% if request.user.role == "ADMIN" %}
+            <div class="produit-actions">
+                <a href="{% url 'stocks:produit_update' produit.pk %}" title="Modifier">✏️</a>
+                <a href="{% url 'stocks:produit_delete' produit.pk %}" title="Supprimer">🗑️</a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="produit-body">
+            <div class="produit-quantite {% if produit.est_en_alerte %}alerte{% endif %}">
+                {{ produit.quantite_actuelle }} {{ produit.get_unite_display }}
+            </div>
+            <p><strong>📏 Unité :</strong> {{ produit.get_unite_display }}</p>
+            {% if produit.emplacement %}
+            <p><strong>📍 Emplacement :</strong> {{ produit.emplacement }}</p>
+            {% endif %}
+            {% if produit.seuil_alerte > 0 %}
+            <p><strong>⚠️ Seuil alerte :</strong> {{ produit.seuil_alerte }} {{ produit.get_unite_display }}</p>
+            {% endif %}
+        </div>
+        <div class="produit-footer">
+            <span class="badge">{{ produit.mouvements.count }} mouvement(s)</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if produits.has_other_pages %}
+<div class="pagination">
+    {% if produits.has_previous %}
+        <a href="?page=1{% if request.GET.alerte %}&alerte={{ request.GET.alerte }}{% endif %}" class="btn-page">«</a>
+        <a href="?page={{ produits.previous_page_number }}{% if request.GET.alerte %}&alerte={{ request.GET.alerte }}{% endif %}" class="btn-page">‹</a>
+    {% endif %}
+    
+    <span class="page-current">
+        Page {{ produits.number }} / {{ produits.paginator.num_pages }}
+    </span>
+    
+    {% if produits.has_next %}
+        <a href="?page={{ produits.next_page_number }}{% if request.GET.alerte %}&alerte={{ request.GET.alerte }}{% endif %}" class="btn-page">›</a>
+        <a href="?page={{ produits.paginator.num_pages }}{% if request.GET.alerte %}&alerte={{ request.GET.alerte }}{% endif %}" class="btn-page">»</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">📦</div>
+    <h3>Aucun produit</h3>
+    <p>Commencez par ajouter des produits à votre stock.</p>
+    {% if request.user.role == "ADMIN" %}
+    <a href="{% url 'stocks:produit_create' %}" class="btn btn-primary">
+        ➕ Ajouter un produit
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,177 @@
+<!-- stocks/templates/stocks/mouvement_confirm_delete.html -->
+{% extends 'stocks/base_stocks.html' %}
+
+{% block stocks_content %}
+<div class="delete-container">
+    <div class="delete-card">
+        <div class="delete-icon">⚠️</div>
+        <h2>Supprimer ce mouvement ?</h2>
+        
+        <div class="mouvement-details">
+            <div class="detail-row">
+                <span class="detail-label">Produit :</span>
+                <span class="detail-value">{{ object.produit.nom }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Type :</span>
+                <span class="detail-value {% if object.type == 'ENTREE' %}entree{% else %}sortie{% endif %}">
+                    {% if object.type == 'ENTREE' %}📥 Entrée{% else %}📤 Sortie{% endif %}
+                </span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Quantité :</span>
+                <span class="detail-value">{{ object.quantite }} {{ object.produit.get_unite_display }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Date :</span>
+                <span class="detail-value">{{ object.date|date:"d/m/Y" }}</span>
+            </div>
+            {% if object.reference %}
+            <div class="detail-row">
+                <span class="detail-label">Référence :</span>
+                <span class="detail-value">{{ object.reference }}</span>
+            </div>
+            {% endif %}
+            {% if object.motif %}
+            <div class="detail-row">
+                <span class="detail-label">Motif :</span>
+                <span class="detail-value">{{ object.motif }}</span>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="alert alert-warning">
+            <strong>⚠️ Attention :</strong> La suppression de ce mouvement va automatiquement <strong>corriger le stock</strong> du produit concerné.
+        </div>
+        
+        <div class="alert alert-info">
+            <strong>💡 Effet sur le stock :</strong><br>
+            {% if object.type == 'ENTREE' %}
+            → Le stock sera <strong>réduit</strong> de {{ object.quantite }} {{ object.produit.get_unite_display }}
+            {% else %}
+            → Le stock sera <strong>augmenté</strong> de {{ object.quantite }} {{ object.produit.get_unite_display }}
+            {% endif %}
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="delete-actions">
+                <button type="submit" class="btn btn-danger">
+                    🗑️ Confirmer la suppression
+                </button>
+                <a href="{% url 'stocks:mouvement_list' %}" class="btn btn-secondary">
+                    ❌ Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .delete-container {
+        max-width: 550px;
+        margin: 40px auto;
+    }
+    .delete-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .delete-icon {
+        font-size: 4rem;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    .delete-card h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #2c3e50;
+        font-size: 1.5rem;
+    }
+    .mouvement-details {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+    .detail-label {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    .detail-value {
+        color: #3498db;
+        font-weight: 500;
+    }
+    .detail-value.entree {
+        color: #27ae60;
+    }
+    .detail-value.sortie {
+        color: #e74c3c;
+    }
+    .alert {
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+    .alert-warning {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+    }
+    .alert-info {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        color: #0c5460;
+    }
+    .delete-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .btn-danger {
+        background: #e74c3c;
+        color: white;
+    }
+    .btn-danger:hover {
+        background: #c0392b;
+    }
+    .btn-secondary {
+        background: #95a5a6;
+        color: white;
+    }
+    .btn-secondary:hover {
+        background: #7f8c8d;
+    }
+    @media (max-width: 768px) {
+        .delete-card {
+            padding: 20px;
+        }
+        .delete-actions {
+            flex-direction: column;
+        }
+        .detail-row {
+            flex-direction: column;
+            gap: 5px;
+        }
+    }
+</style>
+{% endblock %}

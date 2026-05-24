@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <div class="form-header">
+            <h1>{{ title }}</h1>
+            <p class="text-muted">Enregistrement d'un traitement sanitaire</p>
+        </div>
+
+        <form method="post" class="traitement-form">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="{{ form.animal.id_for_label }}">
+                        🐄 Animal *
+                    </label>
+                    {{ form.animal }}
+                    {% if form.animal.errors %}
+                        <small class="text-danger">{{ form.animal.errors }}</small>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.type.id_for_label }}">
+                        📋 Type de traitement *
+                    </label>
+                    {{ form.type }}
+                    {% if form.type.errors %}
+                        <small class="text-danger">{{ form.type.errors }}</small>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.date.id_for_label }}">
+                        📅 Date *
+                    </label>
+                    {{ form.date }}
+                    {% if form.date.errors %}
+                        <small class="text-danger">{{ form.date.errors }}</small>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.produit.id_for_label }}">
+                        💊 Produit *
+                    </label>
+                    {{ form.produit }}
+                    {% if form.produit.errors %}
+                        <small class="text-danger">{{ form.produit.errors }}</small>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.dose.id_for_label }}">
+                        💉 Dose
+                    </label>
+                    {{ form.dose }}
+                    {% if form.dose.errors %}
+                        <small class="text-danger">{{ form.dose.errors }}</small>
+                    {% endif %}
+                    <small class="form-text">Ex: 2ml, 5mg/kg, 1 comprimé</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.rappel_le.id_for_label }}">
+                        ⏰ Date de rappel
+                    </label>
+                    {{ form.rappel_le }}
+                    {% if form.rappel_le.errors %}
+                        <small class="text-danger">{{ form.rappel_le.errors }}</small>
+                    {% endif %}
+                    <small class="form-text">Optionnel - Pour les vaccins uniquement</small>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="{{ form.notes.id_for_label }}">
+                        📝 Notes
+                    </label>
+                    {{ form.notes }}
+                    {% if form.notes.errors %}
+                        <small class="text-danger">{{ form.notes.errors }}</small>
+                    {% endif %}
+                    <small class="form-text">Observations, réactions, informations complémentaires...</small>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    💾 Enregistrer
+                </button>
+                <a href="{% url 'cheptel:traitement_list' %}" class="btn btn-secondary">
+                    ❌ Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .form-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+    
+    .form-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
+    
+    .form-header h1 {
+        margin: 0 0 10px 0;
+        font-size: 1.8rem;
+    }
+    
+    .text-muted {
+        color: rgba(255,255,255,0.9);
+        margin: 0;
+    }
+    
+    .traitement-form {
+        padding: 30px;
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .form-group.full-width {
+        grid-column: span 2;
+    }
+    
+    .form-group label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #2c3e50;
+        font-size: 0.9rem;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 12px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s;
+        font-family: inherit;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+    
+    .form-text {
+        font-size: 0.75rem;
+        color: #7f8c8d;
+        margin-top: 5px;
+    }
+    
+    .text-danger {
+        color: #e74c3c;
+        font-size: 0.75rem;
+        margin-top: 5px;
+    }
+    
+    .alert {
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .alert-danger {
+        background: #fee2e2;
+        border: 1px solid #fecaca;
+        color: #991b1b;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 2px solid #e2e8f0;
+    }
+    
+    .btn {
+        flex: 1;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        text-align: center;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+        background: #f1f3f5;
+        color: #495057;
+    }
+    
+    .btn-secondary:hover {
+        background: #e9ecef;
+    }
+    
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-group.full-width {
+            grid-column: span 1;
+        }
+        
+        .traitement-form {
+            padding: 20px;
+        }
+        
+        .form-header {
+            padding: 20px;
+        }
+        
+        .form-header h1 {
+            font-size: 1.4rem;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,58 @@
+<!-- cultures/templates/cultures/cultureparcelle_confirm_delete.html -->
+{% extends 'cultures/base_cultures.html' %}
+
+{% block cultures_content %}
+<div class="delete-container">
+    <div class="delete-card">
+        <div class="delete-icon">⚠️</div>
+        <h2>Supprimer l'association ?</h2>
+        <p>
+            Êtes-vous sûr de vouloir supprimer l'association<br>
+            <strong>{{ object.culture.nom }} sur {{ object.parcelle.nom }}</strong> ?
+        </p>
+        
+        {% if object.activites.count > 0 %}
+        <div class="alert alert-warning">
+            ⚠️ Attention : Cette association a <strong>{{ object.activites.count }} activité(s)</strong> associée(s).<br>
+            Elles seront également supprimées.
+        </div>
+        {% endif %}
+        
+        <div class="info-box">
+            <p><strong>📅 Date de semis :</strong> {{ object.date_semis|date:"d/m/Y" }}</p>
+            {% if object.date_recolte_prevue %}
+            <p><strong>📅 Récolte prévue :</strong> {{ object.date_recolte_prevue|date:"d/m/Y" }}</p>
+            {% endif %}
+            {% if object.rendement %}
+            <p><strong>📊 Rendement :</strong> {{ object.rendement }} kg</p>
+            {% endif %}
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="delete-actions">
+                <button type="submit" class="btn btn-danger">
+                    🗑️ Confirmer la suppression
+                </button>
+                <a href="{% url 'cultures:cultureparcelle_list' %}" class="btn btn-secondary">
+                    ❌ Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .info-box {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        text-align: left;
+    }
+    .info-box p {
+        margin: 5px 0;
+        color: #2c3e50;
+    }
+</style>
+{% endblock %}

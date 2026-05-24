@@ -1,0 +1,450 @@
+{% extends 'base.html' %}
+
+{% block breadcrumb_items %}
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Cheptel</span>
+</li>
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Rapports</span>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1>📋 Rapports Journaliers</h1>
+            <p class="text-muted">Remplacer WhatsApp par un suivi structuré</p>
+        </div>
+        <a href="{% url 'cheptel:rapport_add' %}" class="btn btn-primary">
+            ➕ Nouveau rapport
+        </a>
+    </div>
+
+    <!-- Statistiques du mois -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">💀</div>
+            <div class="stat-value">{{ total_morts_mois }}</div>
+            <div class="stat-label">Morts ce mois</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🥚</div>
+            <div class="stat-value">{{ total_oeufs_mois }}</div>
+            <div class="stat-label">Œufs pondus</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🌾</div>
+            <div class="stat-value">{{ moyenne_aliment|floatformat:1 }} kg</div>
+            <div class="stat-label">Aliment/jour</div>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="filters-card">
+        <form method="get" class="filters-form">
+            <select name="annee" class="form-control">
+                <option value="">Toutes les années</option>
+                {% for annee in annees_disponibles %}
+                <option value="{{ annee.year }}" {% if request.GET.annee == annee.year|stringformat:"s" %}selected{% endif %}>
+                    {{ annee.year }}
+                </option>
+                {% endfor %}
+            </select>
+            <select name="mois" class="form-control">
+                <option value="">Tous les mois</option>
+                <option value="1" {% if request.GET.mois == "1" %}selected{% endif %}>Janvier</option>
+                <option value="2" {% if request.GET.mois == "2" %}selected{% endif %}>Février</option>
+                <option value="3" {% if request.GET.mois == "3" %}selected{% endif %}>Mars</option>
+                <option value="4" {% if request.GET.mois == "4" %}selected{% endif %}>Avril</option>
+                <option value="5" {% if request.GET.mois == "5" %}selected{% endif %}>Mai</option>
+                <option value="6" {% if request.GET.mois == "6" %}selected{% endif %}>Juin</option>
+                <option value="7" {% if request.GET.mois == "7" %}selected{% endif %}>Juillet</option>
+                <option value="8" {% if request.GET.mois == "8" %}selected{% endif %}>Août</option>
+                <option value="9" {% if request.GET.mois == "9" %}selected{% endif %}>Septembre</option>
+                <option value="10" {% if request.GET.mois == "10" %}selected{% endif %}>Octobre</option>
+                <option value="11" {% if request.GET.mois == "11" %}selected{% endif %}>Novembre</option>
+                <option value="12" {% if request.GET.mois == "12" %}selected{% endif %}>Décembre</option>
+            </select>
+            <button type="submit" class="btn btn-secondary">Filtrer</button>
+            <a href="{% url 'cheptel:rapport_list' %}" class="btn btn-link">Réinitialiser</a>
+        </form>
+    </div>
+
+    <!-- Liste des rapports -->
+    <div class="rapports-list">
+        {% for rapport in rapports %}
+        <div class="rapport-card">
+            <div class="rapport-date">
+                <span class="day">{{ rapport.date|date:"d" }}</span>
+                <span class="month">{{ rapport.date|date:"M"|upper }}</span>
+                <span class="year">{{ rapport.date|date:"Y" }}</span>
+            </div>
+            <div class="rapport-stats">
+                <div class="stat">
+                    <span class="stat-icon">💀</span>
+                    <span class="stat-value">{{ rapport.nombre_morts }}</span>
+                    <span class="stat-label">morts</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-icon">🥚</span>
+                    <span class="stat-value">{{ rapport.oeufs_pondus }}</span>
+                    <span class="stat-label">œufs</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-icon">🤒</span>
+                    <span class="stat-value">{{ rapport.sujets_malades }}</span>
+                    <span class="stat-label">malades</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-icon">🌾</span>
+                    <span class="stat-value">{{ rapport.aliment_kg|default:"0" }}</span>
+                    <span class="stat-label">kg</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-icon">💧</span>
+                    <span class="stat-value">{{ rapport.eau_litres|default:"0" }}</span>
+                    <span class="stat-label">L</span>
+                </div>
+            </div>
+            <div class="rapport-actions">
+                {% if request.user.role == "ADMIN" %}
+                    <a href="{% url 'cheptel:rapport_edit' rapport.pk %}" class="btn-icon" title="Modifier">
+                        ✏️
+                    </a>
+                    <a href="{% url 'cheptel:rapport_delete' rapport.pk %}" class="btn-icon delete" title="Supprimer">
+                        🗑️
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <h3>Aucun rapport</h3>
+            <p>Commencez par enregistrer votre premier rapport journalier.</p>
+            <a href="{% url 'cheptel:rapport_add' %}" class="btn btn-primary">
+                ➕ Créer mon premier rapport
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1{% if request.GET.annee %}&annee={{ request.GET.annee }}{% endif %}{% if request.GET.mois %}&mois={{ request.GET.mois }}{% endif %}" class="btn-page">« Première</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.annee %}&annee={{ request.GET.annee }}{% endif %}{% if request.GET.mois %}&mois={{ request.GET.mois }}{% endif %}" class="btn-page">‹ Précédente</a>
+        {% endif %}
+        
+        <span class="page-current">
+            Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+        </span>
+        
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.annee %}&annee={{ request.GET.annee }}{% endif %}{% if request.GET.mois %}&mois={{ request.GET.mois }}{% endif %}" class="btn-page">Suivante ›</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.annee %}&annee={{ request.GET.annee }}{% endif %}{% if request.GET.mois %}&mois={{ request.GET.mois }}{% endif %}" class="btn-page">Dernière »</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .page-header h1 {
+        margin: 0;
+        color: #2c3e50;
+    }
+    
+    .text-muted {
+        color: #7f8c8d;
+        margin-top: 5px;
+    }
+    
+    /* Statistiques */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .stat-icon {
+        font-size: 2.5rem;
+    }
+    
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: bold;
+    }
+    
+    .stat-label {
+        font-size: 0.85rem;
+        opacity: 0.9;
+    }
+    
+    /* Filtres */
+    .filters-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .filters-form {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+    
+    .filters-form .form-control {
+        min-width: 150px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+    }
+    
+    /* Liste des rapports */
+    .rapports-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .rapport-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .rapport-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+    }
+    
+    .rapport-date {
+        text-align: center;
+        min-width: 70px;
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 8px;
+    }
+    
+    .rapport-date .day {
+        font-size: 1.5rem;
+        font-weight: bold;
+        display: block;
+        color: #2c3e50;
+    }
+    
+    .rapport-date .month {
+        font-size: 0.75rem;
+        color: #7f8c8d;
+    }
+    
+    .rapport-date .year {
+        font-size: 0.7rem;
+        color: #95a5a6;
+    }
+    
+    .rapport-stats {
+        display: flex;
+        gap: 30px;
+        flex-wrap: wrap;
+        flex: 1;
+    }
+    
+    .rapport-stats .stat {
+        text-align: center;
+        min-width: 60px;
+    }
+    
+    .rapport-stats .stat-icon {
+        font-size: 1.2rem;
+        display: block;
+    }
+    
+    .rapport-stats .stat-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    
+    .rapport-stats .stat-label {
+        font-size: 0.7rem;
+        color: #7f8c8d;
+    }
+    
+    .rapport-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .btn-icon {
+        text-decoration: none;
+        padding: 8px 12px;
+        border-radius: 6px;
+        background: #f8f9fa;
+        transition: background 0.2s;
+    }
+    
+    .btn-icon:hover {
+        background: #e9ecef;
+    }
+    
+    .btn-icon.delete:hover {
+        background: #fee2e2;
+    }
+    
+    /* État vide */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 12px;
+    }
+    
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h3 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+    }
+    
+    .empty-state p {
+        color: #7f8c8d;
+        margin-bottom: 20px;
+    }
+    
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+    
+    .btn-page {
+        padding: 8px 15px;
+        background: white;
+        text-decoration: none;
+        color: #667eea;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+    
+    .btn-page:hover {
+        background: #667eea;
+        color: white;
+    }
+    
+    .page-current {
+        padding: 8px 15px;
+        background: #667eea;
+        color: white;
+        border-radius: 6px;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-block;
+        transition: transform 0.2s;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    
+    .btn-link {
+        background: none;
+        color: #667eea;
+        text-decoration: underline;
+        padding: 10px 20px;
+    }
+    
+    .form-control {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+    }
+    
+    @media (max-width: 768px) {
+        .rapport-card {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .rapport-stats {
+            justify-content: center;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .filters-form {
+            flex-direction: column;
+        }
+        
+        .filters-form .form-control {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% if not animaux %}
+<div class="px-6 py-16 text-center">
+  <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-slate-100 text-2xl">🐄</div>
+  <h3 class="mt-4 text-base font-bold text-navy">Aucun animal trouvé</h3>
+  <p class="mt-1 text-sm text-slate-500">Modifiez les filtres ou ajoutez un premier animal.</p>
+  <a href="{% url 'animal_form' %}" class="mt-5 inline-flex rounded-xl bg-leaf px-4 py-2 text-sm font-bold text-white">Ajouter un animal</a>
+</div>
+{% else %}
+<div class="overflow-x-auto">
+  <table class="min-w-full text-left text-sm">
+    <thead>
+      <tr class="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-widest text-slate-400">
+        <th class="px-5 py-4 font-bold">Identifiant</th>
+        <th class="px-5 py-4 font-bold">Espèce / Lot</th>
+        <th class="px-5 py-4 font-bold">Sexe</th>
+        <th class="px-5 py-4 font-bold">Statut</th>
+        <th class="px-5 py-4 text-right font-bold">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-100">
+      {% for animal in animaux %}
+      <tr class="transition hover:bg-slate-50">
+        <td class="px-5 py-4">
+          <p class="font-bold text-navy">{{ animal.numero_identification }}</p>
+          <p class="mt-0.5 text-xs text-slate-500">{{ animal.nom|default:"Sans nom" }}</p>
+        </td>
+        <td class="px-5 py-4">
+          <p class="font-semibold text-slate-700">{{ animal.get_espece_display }}</p>
+          <p class="mt-0.5 text-xs text-slate-500">{{ animal.lot|default:"Aucun lot" }}</p>
+        </td>
+        <td class="px-5 py-4">
+          {% if animal.sexe == 'M' %}
+          <span class="font-bold text-blue-600">♂ Mâle</span>
+          {% else %}
+          <span class="font-bold text-rose-600">♀ Femelle</span>
+          {% endif %}
+        </td>
+        <td class="px-5 py-4">
+          {% if animal.statut == 'actif' %}
+          <span class="inline-flex rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-800">🟢 Actif</span>
+          {% elif animal.statut == 'malade' %}
+          <span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-800">🔴 Malade</span>
+          {% elif animal.statut == 'reproduction' %}
+          <span class="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800">🔵 Reproduction</span>
+          {% elif animal.statut == 'vente' %}
+          <span class="inline-flex rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-800">🟡 À vendre</span>
+          {% else %}
+          <span class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">{{ animal.get_statut_display }}</span>
+          {% endif %}
+        </td>
+        <td class="px-5 py-4 text-right">
+          <div class="inline-flex items-center gap-2">
+            <a href="{% url 'animal_edit' animal.id %}" class="rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 transition hover:bg-blue-100">Modifier</a>
+            <button class="rounded-lg bg-red-50 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-100"
+                    hx-post="{% url 'animal_delete' animal.id %}"
+                    hx-confirm="Supprimer définitivement {{ animal.numero_identification }} ?"
+                    hx-target="#animaux-list"
+                    hx-swap="innerHTML">
+              Supprimer
+            </button>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}

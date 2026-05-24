@@ -1,0 +1,60 @@
+<!-- cultures/templates/cultures/cultureparcelle_list.html -->
+{% extends 'cultures/base_cultures.html' %}
+
+{% block cultures_content %}
+<div class="page-header">
+    <h1>🔗 Cultures sur parcelles</h1>
+    {% if request.user.role == "ADMIN" %}
+    <a href="{% url 'cultures:cultureparcelle_create' %}" class="btn btn-primary">
+        ➕ Nouvelle association
+    </a>
+    {% endif %}
+</div>
+
+{% if cultures_parcelles %}
+<div class="parcelles-grid">
+    {% for item in cultures_parcelles %}
+    <div class="parcelle-card">
+        <div class="parcelle-header">
+            <h3>{{ item.culture.nom }} sur {{ item.parcelle.nom }}</h3>
+            {% if request.user.role == "ADMIN" %}
+            <div class="parcelle-actions">
+                <a href="{% url 'cultures:cultureparcelle_update' item.pk %}" class="btn-icon" title="Modifier">✏️</a>
+                <a href="{% url 'cultures:cultureparcelle_delete' item.pk %}" class="btn-icon delete" title="Supprimer">🗑️</a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="parcelle-body">
+            <p><strong>📅 Date de semis :</strong> {{ item.date_semis|date:"d/m/Y" }}</p>
+            {% if item.date_recolte_prevue %}
+            <p><strong>📅 Récolte prévue :</strong> {{ item.date_recolte_prevue|date:"d/m/Y" }}</p>
+            {% endif %}
+            {% if item.date_recolte_reelle %}
+            <p><strong>✅ Récolte réalisée :</strong> {{ item.date_recolte_reelle|date:"d/m/Y" }}</p>
+            {% endif %}
+            {% if item.rendement %}
+            <p><strong>📊 Rendement :</strong> {{ item.rendement }} kg</p>
+            {% endif %}
+            {% if item.notes %}
+            <p><strong>📝 Notes :</strong> {{ item.notes|truncatechars:80 }}</p>
+            {% endif %}
+        </div>
+        <div class="parcelle-footer">
+            <span class="badge">{{ item.activites.count }} activité(s)</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">🔗</div>
+    <h3>Aucune association</h3>
+    <p>Associez une culture à une parcelle pour commencer le suivi.</p>
+    {% if request.user.role == "ADMIN" %}
+    <a href="{% url 'cultures:cultureparcelle_create' %}" class="btn btn-primary">
+        ➕ Créer une association
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,64 @@
+<div class="flex justify-between items-center mb-6">
+    <h3 class="font-bold text-[#1e3a5f] uppercase tracking-widest text-xs">Gestion des Utilisateurs</h3>
+    <button class="bg-[#1e3a5f] hover:bg-[#2a5285] text-white text-xs font-bold py-2 px-4 rounded-lg shadow-md transition">
+        + Nouvel Employé
+    </button>
+</div>
+
+<div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+        <thead>
+            <tr class="bg-gray-50 text-[10px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                <th class="p-4 font-bold">Utilisateur</th>
+                <th class="p-4 font-bold">Rôle</th>
+                <th class="p-4 font-bold">Statut</th>
+                <th class="p-4 font-bold">Dernière connexion</th>
+                <th class="p-4 font-bold text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+            {% for u in utilisateurs %}
+            <tr class="hover:bg-gray-50/50 transition">
+                <td class="p-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">
+                            {{ u.username|make_list|first|upper }}
+                        </div>
+                        <div>
+                            <div class="font-bold text-[#1e3a5f]">{{ u.username }}</div>
+                            <div class="text-[10px] text-gray-400">{{ u.email|default:"Pas d'email" }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="p-4">
+                    {% if u.role == 'ADMIN' %}
+                        <span class="bg-purple-100 text-purple-800 text-[10px] font-bold uppercase px-3 py-1 rounded-full">Admin</span>
+                    {% else %}
+                        <span class="bg-gray-100 text-gray-800 text-[10px] font-bold uppercase px-3 py-1 rounded-full">Employé</span>
+                    {% endif %}
+                </td>
+                <td class="p-4">
+                    {% if u.is_active %}
+                        <span class="text-green-500 font-bold text-xs flex items-center gap-1">🟢 Actif</span>
+                    {% else %}
+                        <span class="text-red-500 font-bold text-xs flex items-center gap-1">🔴 Suspendu</span>
+                    {% endif %}
+                </td>
+                <td class="p-4 text-xs text-gray-500">
+                    {{ u.last_login|date:"d/m/Y H:i"|default:"Jamais" }}
+                </td>
+                <td class="p-4 text-right space-x-2">
+                    <button class="text-blue-500 hover:text-blue-700 font-bold text-xs bg-blue-50 px-2 py-1 rounded transition">Éditer</button>
+                    {% if u.role != 'ADMIN' %}
+                    <button class="text-red-500 hover:text-red-700 font-bold text-xs bg-red-50 px-2 py-1 rounded transition">Désactiver</button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="p-8 text-center text-gray-400 italic">Aucun utilisateur trouvé.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

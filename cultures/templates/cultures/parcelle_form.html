@@ -1,0 +1,69 @@
+<!-- cultures/templates/cultures/parcelle_form.html -->
+{% extends 'cultures/base_cultures.html' %}
+
+{% block cultures_content %}
+<div class="form-container">
+    <div class="form-header">
+        <h1>{{ title }}</h1>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="form-group">
+            <label for="{{ form.nom.id_for_label }}">Nom de la parcelle *</label>
+            {{ form.nom }}
+            {% if form.nom.errors %}
+                <small class="text-danger">{{ form.nom.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text">Ex: Champ Nord, Parcelle A, Zone Est</small>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="{{ form.superficie.id_for_label }}">Superficie (ha) *</label>
+                {{ form.superficie }}
+                {% if form.superficie.errors %}
+                    <small class="text-danger">{{ form.superficie.errors.0 }}</small>
+                {% endif %}
+                <small class="form-text">En hectares (ex: 2.5)</small>
+            </div>
+            
+            <div class="form-group col-md-6">
+                <label for="{{ form.type_sol.id_for_label }}">Type de sol</label>
+                {{ form.type_sol }}
+                {% if form.type_sol.errors %}
+                    <small class="text-danger">{{ form.type_sol.errors.0 }}</small>
+                {% endif %}
+                <small class="form-text">Argileux, Sableux, Limoneux, Humifère</small>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.localisation.id_for_label }}">Localisation</label>
+            {{ form.localisation }}
+            {% if form.localisation.errors %}
+                <small class="text-danger">{{ form.localisation.errors.0 }}</small>
+            {% endif %}
+            <small class="form-text">Description géographique ou adresse</small>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                💾 Enregistrer
+            </button>
+            <a href="{% url 'cultures:parcelle_list' %}" class="btn btn-secondary">
+                ❌ Annuler
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

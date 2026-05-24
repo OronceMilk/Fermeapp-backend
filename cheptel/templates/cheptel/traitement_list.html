@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block breadcrumb_items %}
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Cheptel</span>
+</li>
+<li class="inline-flex items-center">
+    <span class="mx-2 text-slate-400">/</span>
+    <span class="text-sm font-medium text-slate-700">Traitements</span>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1>💊 Traitements sanitaires</h1>
+            <p class="text-muted">Suivi des vaccins, traitements et maladies</p>
+        </div>
+        <a href="{% url 'cheptel:traitement_add' %}" class="btn btn-primary">
+            ➕ Nouveau traitement
+        </a>
+    </div>
+
+    <!-- Alertes rappels de vaccins -->
+    {% if alertes_rappel %}
+    <div class="alert alert-warning">
+        <strong>⚠️ Rappels à venir (7 jours) :</strong>
+        <ul>
+            {% for traitement in alertes_rappel %}
+            <li>
+                {{ traitement.animal.identifiant }} - 
+                {{ traitement.produit.nom }} - 
+                Rappel le {{ traitement.rappel_le|date:"d/m/Y" }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Statistiques -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">💊</div>
+            <div class="stat-value">{{ total_traitements }}</div>
+            <div class="stat-label">Traitements totaux</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💉</div>
+            <div class="stat-value">{{ vaccins_mois }}</div>
+            <div class="stat-label">Vaccins ce mois</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-value">{{ alertes_rappel|length }}</div>
+            <div class="stat-label">Rappels à venir</div>
+        </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="filters-card">
+        <form method="get" class="filters-form">
+            <select name="type" class="form-control">
+                <option value="">Tous les types</option>
+                <option value="VACCIN" {% if request.GET.type == "VACCIN" %}selected{% endif %}>💉 Vaccination</option>
+                <option value="TRAITEMENT" {% if request.GET.type == "TRAITEMENT" %}selected{% endif %}>💊 Traitement</option>
+                <option value="MALADIE" {% if request.GET.type == "MALADIE" %}selected{% endif %}>🤒 Maladie</option>
+            </select>
+            <select name="animal" class="form-control">
+                <option value="">Tous les animaux</option>
+                {% for animal in animaux %}
+                <option value="{{ animal.id }}" {% if request.GET.animal == animal.id|stringformat:"s" %}selected{% endif %}>
+                    {{ animal.identifiant }} - {{ animal.nom|default:animal.espece.nom }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-secondary">Filtrer</button>
+            <a href="{% url 'cheptel:traitement_list' %}" class="btn btn-link">Réinitialiser</a>
+        </form>
+    </div>
+
+    <!-- Liste des traitements -->
+    <div class="traitements-list">
+        {% for traitement in traitements %}
+        <div class="traitement-card">
+            <div class="traitement-header">
+                <div class="traitement-type type-{{ traitement.type|lower }}">
+                    {% if traitement.type == 'VACCIN' %}💉{% elif traitement.type == 'TRAITEMENT' %}💊{% else %}🤒{% endif %}
+                    {{ traitement.get_type_display }}
+                </div>
+                <div class="traitement-date">
+                    {{ traitement.date|date:"d/m/Y" }}
+                </div>
+            </div>
+            <div class="traitement-body">
+                <div class="traitement-animal">
+                    <strong>🐄 {{ traitement.animal.identifiant }}</strong>
+                    {% if traitement.animal.nom %} - {{ traitement.animal.nom }}{% endif %}
+                </div>
+                <div class="traitement-produit">
+                    📦 {{ traitement.produit.nom }}
+                    {% if traitement.dose %} | 💊 {{ traitement.dose }}{% endif %}
+                </div>
+                {% if traitement.rappel_le %}
+                <div class="traitement-rappel">
+                    ⏰ Rappel : {{ traitement.rappel_le|date:"d/m/Y" }}
+                    {% if traitement.rappel_le > today %}
+                        {% with jours_restants=traitement.rappel_le|timeuntil %}
+                            (dans {{ jours_restants }})
+                        {% endwith %}
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% if traitement.notes %}
+                <div class="traitement-notes">
+                    📝 {{ traitement.notes|truncatechars:100 }}
+                </div>
+                {% endif %}
+            </div>
+            <div class="traitement-footer">
+                <span class="operateur">👤 {{ traitement.operateur.get_full_name|default:traitement.operateur.username }}</span>
+                <div class="traitement-actions">
+                    <a href="{% url 'cheptel:traitement_edit' traitement.pk %}" class="btn-icon" title="Modifier">✏️</a>
+                    {% if request.user.role == "ADMIN" %}
+                        <a href="{% url 'cheptel:traitement_delete' traitement.pk %}" class="btn-icon delete" title="Supprimer">🗑️</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <div class="empty-icon">💊</div>
+            <h3>Aucun traitement</h3>
+            <p>Commencez par enregistrer un vaccin ou un traitement.</p>
+            <a href="{% url 'cheptel:traitement_add' %}" class="btn btn-primary">
+                ➕ Premier traitement
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn-page">« Première</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn-page">‹ Précédente</a>
+        {% endif %}
+        <span class="page-current">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn-page">Suivante ›</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" class="btn-page">Dernière »</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
+    .page-header h1 { margin: 0; color: #2c3e50; }
+    .text-muted { color: #7f8c8d; margin-top: 5px; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; display: flex; align-items: center; gap: 15px; }
+    .stat-icon { font-size: 2rem; }
+    .stat-value { font-size: 1.5rem; font-weight: bold; }
+    .stat-label { font-size: 0.8rem; opacity: 0.9; }
+    
+    .filters-card { background: white; padding: 20px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .filters-form { display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; }
+    .filters-form .form-control { min-width: 150px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+    
+    .traitements-list { display: flex; flex-direction: column; gap: 15px; }
+    .traitement-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: transform 0.2s; }
+    .traitement-card:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.12); }
+    
+    .traitement-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0; }
+    .traitement-type { padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+    .type-vaccin { background: #d4edda; color: #155724; }
+    .type-traitement { background: #fff3cd; color: #856404; }
+    .type-maladie { background: #f8d7da; color: #721c24; }
+    .traitement-date { color: #7f8c8d; font-size: 0.85rem; }
+    
+    .traitement-body { margin-bottom: 15px; }
+    .traitement-animal { font-size: 1.1rem; margin-bottom: 8px; }
+    .traitement-produit { color: #4a5568; margin-bottom: 5px; font-size: 0.9rem; }
+    .traitement-rappel { color: #e67e22; font-size: 0.85rem; margin-top: 8px; }
+    .traitement-notes { color: #7f8c8d; font-size: 0.85rem; margin-top: 8px; font-style: italic; }
+    
+    .traitement-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #e2e8f0; font-size: 0.8rem; }
+    .operateur { color: #7f8c8d; }
+    .traitement-actions { display: flex; gap: 10px; }
+    .btn-icon { text-decoration: none; padding: 5px 10px; border-radius: 6px; background: #f8f9fa; }
+    .btn-icon.delete:hover { background: #fee2e2; }
+    
+    .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    .alert-warning { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+    .alert-warning ul { margin: 10px 0 0 20px; }
+    
+    .empty-state { text-align: center; padding: 60px 20px; background: white; border-radius: 12px; }
+    .empty-icon { font-size: 4rem; margin-bottom: 20px; }
+    
+    .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 30px; flex-wrap: wrap; }
+    .btn-page { padding: 8px 15px; background: white; text-decoration: none; color: #667eea; border-radius: 6px; }
+    .page-current { padding: 8px 15px; background: #667eea; color: white; border-radius: 6px; }
+    
+    .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px 20px; border: none; border-radius: 8px; text-decoration: none; }
+    .btn-secondary { background: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; }
+    .btn-link { background: none; color: #667eea; text-decoration: underline; padding: 10px 20px; }
+    .form-control { padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+</style>
+{% endblock %}

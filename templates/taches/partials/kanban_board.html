@@ -1,0 +1,102 @@
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+
+    <div class="bg-gray-50 rounded-3xl p-4 border border-gray-100 flex flex-col h-full min-h-[500px]">
+        <div class="flex justify-between items-center mb-4 px-2">
+            <h3 class="font-black text-gray-700 uppercase tracking-widest text-sm">📋 À Faire</h3>
+            <span class="bg-gray-200 text-gray-600 text-xs font-bold px-2 py-1 rounded-full">{{ taches_a_faire|length }}</span>
+        </div>
+        
+        <div class="space-y-4 flex-1">
+            {% for tache in taches_a_faire %}
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition group">
+                <div class="flex justify-between items-start mb-2">
+                    {% if tache.priorite == 'HAUTE' %}
+                        <span class="bg-red-100 text-red-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Urgente</span>
+                    {% elif tache.priorite == 'MOYENNE' %}
+                        <span class="bg-orange-100 text-orange-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Normale</span>
+                    {% else %}
+                        <span class="bg-green-100 text-green-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Basse</span>
+                    {% endif %}
+                    <span class="text-xs font-bold text-gray-400">📅 {{ tache.date_limite|date:"d/m" }}</span>
+                </div>
+                
+                <h4 class="font-bold text-[#1e3a5f] text-sm mb-3">{{ tache.titre }}</h4>
+                
+                <div class="flex justify-between items-center mt-4">
+                    <div class="flex items-center gap-2 text-xs font-bold text-gray-500">
+                        <span class="bg-[#1e3a5f] text-white w-6 h-6 rounded-full flex items-center justify-center">
+                            {{ tache.responsable.username|make_list|first|upper }}
+                        </span>
+                        {{ tache.responsable.username }}
+                    </div>
+                    
+                    <button hx-post="/taches/{{ tache.id }}/status/"
+                            hx-vals='{"statut": "EN_COURS"}'
+                            hx-target="#kanban-board"
+                            class="opacity-0 group-hover:opacity-100 transition text-[#7cb518] hover:bg-green-50 p-2 rounded-lg"
+                            title="Commencer la tâche">
+                        ▶️
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="bg-blue-50/50 rounded-3xl p-4 border border-blue-100 flex flex-col h-full min-h-[500px]">
+        <div class="flex justify-between items-center mb-4 px-2">
+            <h3 class="font-black text-blue-700 uppercase tracking-widest text-sm">⏳ En Cours</h3>
+            <span class="bg-blue-200 text-blue-800 text-xs font-bold px-2 py-1 rounded-full">{{ taches_en_cours|length }}</span>
+        </div>
+        
+        <div class="space-y-4 flex-1">
+            {% for tache in taches_en_cours %}
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-blue-100 hover:shadow-md transition group border-l-4 border-l-blue-500">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs font-bold text-blue-500 animate-pulse">En progression...</span>
+                    <span class="text-xs font-bold text-gray-400">📅 {{ tache.date_limite|date:"d/m" }}</span>
+                </div>
+                
+                <h4 class="font-bold text-[#1e3a5f] text-sm mb-3">{{ tache.titre }}</h4>
+                
+                <div class="flex justify-between items-center mt-4">
+                    <div class="flex items-center gap-2 text-xs font-bold text-gray-500">
+                        <span class="bg-[#1e3a5f] text-white w-6 h-6 rounded-full flex items-center justify-center">
+                            {{ tache.responsable.username|make_list|first|upper }}
+                        </span>
+                        {{ tache.responsable.username }}
+                    </div>
+                    
+                    <button hx-post="/taches/{{ tache.id }}/status/"
+                            hx-vals='{"statut": "TERMINE"}'
+                            hx-target="#kanban-board"
+                            class="bg-[#7cb518] text-white hover:bg-[#689914] text-xs font-bold px-3 py-1.5 rounded-lg transition"
+                            title="Marquer comme terminé">
+                        ✅ Terminer
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="bg-green-50/50 rounded-3xl p-4 border border-green-100 flex flex-col h-full min-h-[500px]">
+        <div class="flex justify-between items-center mb-4 px-2">
+            <h3 class="font-black text-green-700 uppercase tracking-widest text-sm">✅ Terminé</h3>
+            <span class="bg-green-200 text-green-800 text-xs font-bold px-2 py-1 rounded-full">{{ taches_terminees|length }}</span>
+        </div>
+        
+        <div class="space-y-4 flex-1">
+            {% for tache in taches_terminees %}
+            <div class="bg-white/60 p-4 rounded-2xl border border-green-100 opacity-75 hover:opacity-100 transition">
+                <h4 class="font-bold text-gray-500 text-sm mb-2 line-through">{{ tache.titre }}</h4>
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] font-bold text-green-600">Achevée</span>
+                    <span class="text-[10px] text-gray-400">par {{ tache.responsable.username }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>

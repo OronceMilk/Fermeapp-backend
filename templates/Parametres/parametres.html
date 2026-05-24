@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Paramètres — FermeApp{% endblock %}
+{% block page_title %}Paramètres{% endblock %}
+{% block breadcrumb %}Administration / Paramètres{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+  <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <h2 class="text-xl font-extrabold text-navy">Paramètres du MVP</h2>
+    <p class="mt-1 text-sm text-slate-500">Espace prévu pour gérer les espèces, lots, produits et accès utilisateurs.</p>
+  </section>
+
+  <section class="grid grid-cols-1 gap-4 md:grid-cols-3">
+    <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="grid h-11 w-11 place-items-center rounded-xl bg-leaf-soft text-xl">🐄</div>
+      <h3 class="mt-4 font-extrabold text-navy">Espèces & races</h3>
+      <p class="mt-2 text-sm text-slate-500">À connecter quand les référentiels métier seront modélisés.</p>
+    </article>
+    <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="grid h-11 w-11 place-items-center rounded-xl bg-blue-100 text-xl">🥚</div>
+      <h3 class="mt-4 font-extrabold text-navy">Lots</h3>
+      <p class="mt-2 text-sm text-slate-500">Aujourd'hui, les lots sont déduits des fiches animaux.</p>
+    </article>
+    <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="grid h-11 w-11 place-items-center rounded-xl bg-orange-100 text-xl">👤</div>
+      <h3 class="mt-4 font-extrabold text-navy">Comptes & rôles</h3>
+      <p class="mt-2 text-sm text-slate-500">ADMIN et EMPLOYE seront séparés côté interface et permissions.</p>
+    </article>
+  </section>
+</div>
+{% endblock %}

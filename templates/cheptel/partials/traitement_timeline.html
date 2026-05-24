@@ -1,0 +1,52 @@
+{% if not traitements %}
+<div class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
+  <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-slate-100 text-2xl">🩺</div>
+  <h3 class="mt-4 text-base font-bold text-navy">Aucun historique sanitaire</h3>
+  <p class="mt-1 text-sm text-slate-500">Les traitements enregistrés apparaîtront ici.</p>
+</div>
+{% else %}
+<div class="relative ml-4 border-l-2 border-slate-200 pb-2">
+  {% for traitement in traitements %}
+  <article class="relative mb-6 pl-8">
+    <div class="absolute -left-[17px] top-1 grid h-8 w-8 place-items-center rounded-full border-4 border-page-soft bg-white shadow-sm">
+      {% if traitement.type == 'vaccin' %}💉{% elif traitement.type == 'medicament' %}💊{% elif traitement.type == 'vermifuge' %}⚠️{% else %}🩺{% endif %}
+    </div>
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <h3 class="font-extrabold text-navy">{{ traitement.animal.numero_identification }}</h3>
+            {% if traitement.type == 'vaccin' %}
+            <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800">Vaccin</span>
+            {% elif traitement.type == 'medicament' %}
+            <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-800">Médicament</span>
+            {% elif traitement.type == 'vermifuge' %}
+            <span class="rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-800">Vermifuge</span>
+            {% else %}
+            <span class="rounded-full bg-leaf-soft px-3 py-1 text-xs font-bold text-leaf">Soins</span>
+            {% endif %}
+          </div>
+          <p class="mt-2 text-sm text-slate-600">{{ traitement.description }}</p>
+        </div>
+        <span class="rounded-lg bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">{{ traitement.date|date:"d/m/Y" }}</span>
+      </div>
+
+      <div class="mt-4 grid grid-cols-1 gap-3 rounded-xl bg-slate-50 p-4 text-sm md:grid-cols-2">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Prochaine date</p>
+          <p class="mt-1 font-semibold text-navy">{{ traitement.date_prochaine|date:"d/m/Y"|default:"-" }}</p>
+        </div>
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Vétérinaire</p>
+          <p class="mt-1 font-semibold text-navy">{{ traitement.veterinaire|default:"-" }}</p>
+        </div>
+      </div>
+
+      {% if traitement.notes %}
+      <p class="mt-4 border-l-2 border-slate-200 pl-3 text-sm italic text-slate-500">{{ traitement.notes }}</p>
+      {% endif %}
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% endif %}

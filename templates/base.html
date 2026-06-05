@@ -51,6 +51,37 @@
       box-shadow: 0 0 0 3px rgba(124, 181, 24, 0.18);
       background: #fff;
     }
+    .btn,
+    a[class*="btn"],
+    button,
+    a[role="button"],
+    input[type="submit"],
+    input[type="button"] {
+      min-height: 44px;
+      min-width: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button:focus-visible,
+    .btn:focus-visible,
+    a[class*="btn"]:focus-visible {
+      outline: 3px solid rgba(124, 181, 24, 0.65);
+      outline-offset: 2px;
+    }
+    .btn-sm {
+      min-height: 36px;
+      min-width: 36px;
+    }
+    button:active,
+    .btn:active {
+      transform: scale(0.97);
+    }
     ul.errorlist {
       margin-top: 0.35rem;
       color: #dc2626;
@@ -64,8 +95,9 @@
 </head>
 
 <body class="min-h-screen bg-page-soft text-slate-700" data-user-role="{{ request.user.role|default:'ADMIN' }}">
+  <div id="sidebar-overlay" class="md:hidden fixed inset-0 z-30 bg-black/50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
   <div class="min-h-screen md:flex">
-    <aside class="md:fixed md:inset-y-0 md:left-0 md:w-64 bg-navy text-white z-30">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-navy text-white z-40 transform -translate-x-full md:translate-x-0 md:fixed md:inset-y-0 md:left-0 md:w-64 transition-transform duration-300">
       <div class="flex h-full flex-col">
         <div class="px-5 py-5 border-b border-white/10">
           <a href="{% url 'dashboard:home' %}" class="flex items-center gap-3">
@@ -134,8 +166,13 @@
     </aside>
 
     <div class="min-h-screen flex-1 md:ml-64">
-      <header class="sticky top-0 z-20 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:px-8">
-        <div class="flex items-center justify-between">
+      <header class="relative sticky top-0 z-20 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:px-8">
+      <button id="menu-toggle" class="md:hidden absolute top-4 left-4 z-50 bg-navy text-white p-3 rounded-xl shadow-lg active:scale-95 transition-transform">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      <div class="flex items-center justify-between">
           <nav class="flex" aria-label="Breadcrumb">
             <ol class="inline-flex items-center space-x-1 md:space-x-3">
               <li class="inline-flex items-center">
@@ -152,7 +189,7 @@
         </div>
       </header>
 
-      <main class="px-4 py-6 md:px-8">
+      <main class="min-h-screen pt-16 md:pt-0 px-3 sm:px-4 md:px-6 pb-6">
         {% if messages %}
         <div class="mb-5 space-y-2">
           {% for message in messages %}
@@ -184,6 +221,18 @@
       const s = e.detail.xhr.status;
       if (window.showToast) window.showToast(s === 403 ? 'Accès refusé' : s === 404 ? 'Introuvable' : `Erreur ${s}`, 'error');
     });
+    const toggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const toggleMenu = () => {
+      sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('opacity-0');
+      overlay.classList.toggle('pointer-events-none');
+    };
+    if (toggle && sidebar && overlay) {
+      toggle.addEventListener('click', toggleMenu);
+      overlay.addEventListener('click', toggleMenu);
+    }
   </script>
 </body>
 </html>

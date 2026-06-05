@@ -14,7 +14,7 @@
             <p class="text-muted">Remplissez les informations du jour</p>
         </div>
 
-        <form method="post" class="rapport-form">
+        <form method="post" class="rapport-form space-y-4">
             {% csrf_token %}
             
             {% if form.non_field_errors %}
@@ -25,9 +25,9 @@
                 </div>
             {% endif %}
             
-            <div class="form-grid">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Date -->
-                <div class="form-group full-width">
+                <div class="form-group md:col-span-2">
                     <label for="{{ form.date.id_for_label }}">
                         📅 Date *
                     </label>
@@ -91,7 +91,7 @@
                 </div>
                 
                 <!-- Notes -->
-                <div class="form-group full-width">
+                <div class="form-group md:col-span-2">
                     <label for="{{ form.notes.id_for_label }}">
                         📝 Notes
                     </label>

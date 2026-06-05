@@ -7,7 +7,7 @@
             <h2>{{ title }}</h2>
         </div>
         <div class="card-body">
-            <form method="post" enctype="multipart/form-data">
+            <form method="post" enctype="multipart/form-data" class="space-y-4">
                 {% csrf_token %}
                 
                 {% if form.non_field_errors %}
@@ -18,8 +18,8 @@
                     </div>
                 {% endif %}
                 
-                <div class="form-row">
-                    <div class="form-group col-md-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
                         <label for="{{ form.identifiant.id_for_label }}">Identifiant *</label>
                         {{ form.identifiant }}
                         {% if form.identifiant.errors %}
@@ -28,7 +28,7 @@
                         <small class="form-text text-muted">Identifiant unique de l'animal (ex: PO-001, LAP-005)</small>
                     </div>
                     
-                    <div class="form-group col-md-6">
+                    <div class="form-group">
                         <label for="{{ form.nom.id_for_label }}">Nom</label>
                         {{ form.nom }}
                         {% if form.nom.errors %}
@@ -38,8 +38,8 @@
                     </div>
                 </div>
                 
-                <div class="form-row">
-                    <div class="form-group col-md-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
                         <label for="{{ form.espece.id_for_label }}">Espèce *</label>
                         {{ form.espece }}
                         {% if form.espece.errors %}
@@ -47,7 +47,7 @@
                         {% endif %}
                     </div>
                     
-                    <div class="form-group col-md-6">
+                    <div class="form-group">
                         <label for="{{ form.lot.id_for_label }}">Lot</label>
                         {{ form.lot }}
                         {% if form.lot.errors %}
@@ -57,8 +57,8 @@
                     </div>
                 </div>
                 
-                <div class="form-row">
-                    <div class="form-group col-md-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
                         <label for="{{ form.race.id_for_label }}">Race</label>
                         {{ form.race }}
                         {% if form.race.errors %}
@@ -66,7 +66,7 @@
                         {% endif %}
                     </div>
                     
-                    <div class="form-group col-md-6">
+                    <div class="form-group">
                         <label for="{{ form.sexe.id_for_label }}">Sexe *</label>
                         {{ form.sexe }}
                         {% if form.sexe.errors %}
@@ -75,8 +75,8 @@
                     </div>
                 </div>
                 
-                <div class="form-row">
-                    <div class="form-group col-md-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
                         <label for="{{ form.date_naissance.id_for_label }}">Date de naissance</label>
                         {{ form.date_naissance }}
                         {% if form.date_naissance.errors %}
@@ -85,7 +85,7 @@
                         <small class="form-text text-muted">Format: YYYY-MM-DD</small>
                     </div>
                     
-                    <div class="form-group col-md-6">
+                    <div class="form-group">
                         <label for="{{ form.statut.id_for_label }}">Statut</label>
                         {{ form.statut }}
                         {% if form.statut.errors %}

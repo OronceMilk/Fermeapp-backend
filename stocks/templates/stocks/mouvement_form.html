@@ -21,7 +21,7 @@
         <h1>{{ title }}</h1>
     </div>
     
-    <form method="post">
+    <form method="post" class="space-y-4">
         {% csrf_token %}
         
         {% if form.non_field_errors %}
@@ -32,9 +32,10 @@
         </div>
         {% endif %}
         
-        <div class="form-group">
-            <label for="{{ form.produit.id_for_label }}">Produit *</label>
-            {{ form.produit }}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group">
+                <label for="{{ form.produit.id_for_label }}">Produit *</label>
+                {{ form.produit }}
             {% if form.produit.errors %}
                 <small class="text-danger">{{ form.produit.errors.0 }}</small>
             {% endif %}
@@ -68,7 +69,7 @@
         </div>
         {% endif %}
         
-        <div class="form-group">
+        <div class="form-group md:col-span-2">
             <label for="{{ form.reference.id_for_label }}">Référence</label>
             {{ form.reference }}
             {% if form.reference.errors %}
@@ -83,7 +84,7 @@
             </small>
         </div>
         
-        <div class="form-group">
+        <div class="form-group md:col-span-2">
             <label for="{{ form.motif.id_for_label }}">Motif</label>
             {{ form.motif }}
             {% if form.motif.errors %}
@@ -96,6 +97,7 @@
                 Raison de la consommation (ex: alimentation animaux, traitement vétérinaire)
                 {% endif %}
             </small>
+        </div>
         </div>
         
         <div class="form-actions">

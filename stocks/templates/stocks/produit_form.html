@@ -7,7 +7,7 @@
         <h1>{{ title }}</h1>
     </div>
     
-    <form method="post">
+    <form method="post" class="space-y-4">
         {% csrf_token %}
         
         {% if form.non_field_errors %}
@@ -44,8 +44,8 @@
             <small class="form-text">Où est stocké ce produit ? (Ex: Magasin principal)</small>
         </div>
         
-        <div class="form-row">
-            <div class="form-group col-md-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="form-group">
                 <label for="{{ form.quantite_actuelle.id_for_label }}">Quantité actuelle</label>
                 {{ form.quantite_actuelle }}
                 {% if form.quantite_actuelle.errors %}
@@ -53,7 +53,7 @@
                 {% endif %}
             </div>
             
-            <div class="form-group col-md-6">
+            <div class="form-group">
                 <label for="{{ form.seuil_alerte.id_for_label }}">Seuil d'alerte</label>
                 {{ form.seuil_alerte }}
                 {% if form.seuil_alerte.errors %}

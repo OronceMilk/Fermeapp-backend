@@ -22,6 +22,8 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard/dashboard.html'
     
     def get_context_data(self, **kwargs):
+        # 🔥 ERREUR VOLONTAIRE POUR TEST SENTRY
+raise Exception("Test Sentry - erreur volontaire")
         context = super().get_context_data(**kwargs)
         context['date_today'] = timezone.now()
         user = self.request.user

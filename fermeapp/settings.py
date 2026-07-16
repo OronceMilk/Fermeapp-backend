@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ENVIRONNEMENT
 # ============================================
 env = environ.Env(
-    DJANGO_DEBUG=(bool, False),  # valeur par défaut sûre si la variable est absente
+    DJANGO_DEBUG=(bool, False),
 )
 environ.Env.read_env(BASE_DIR / '.env')
 
@@ -33,7 +33,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',      # 🔥 AJOUTÉ
     'django.contrib.staticfiles',
+    'cloudinary',              # 🔥 AJOUTÉ
     'accounts',
     'cheptel',
     'cultures',
@@ -146,18 +148,7 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
- # ============================================
-# SECURITE PRODUCTION
 # ============================================
-if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 60 * 60 * 24 * 7  # 1 semaine
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-    # ============================================
 # LOGGING
 # ============================================
 LOGGING = {
@@ -193,6 +184,9 @@ LOGGING = {
     },
 }
 
+# ============================================
+# SENTRY
+# ============================================
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
@@ -204,3 +198,15 @@ if SENTRY_DSN:
         traces_sample_rate=0.1,
         send_default_pii=False,
     )
+
+# ============================================
+# CLOUDINARY (stockage médias en production)
+# ============================================
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': env('CLOUDINARY_CLOUD_NAME', default=''),
+    'API_KEY': env('CLOUDINARY_API_KEY', default=''),
+    'API_SECRET': env('CLOUDINARY_API_SECRET', default=''),
+}
+
+if not DEBUG and CLOUDINARY_STORAGE['CLOUD_NAME']:
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

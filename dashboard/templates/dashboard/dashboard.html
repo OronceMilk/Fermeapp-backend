@@ -147,6 +147,14 @@
 {% endblock %}
 
 {% block content %}
+{% if no_ferme %}
+<div class="dashboard-container">
+    <div class="p-6 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-800">
+        <p class="font-semibold">⚠️ Aucune ferme associée à ton compte.</p>
+        <p class="text-sm mt-1">Contacte un administrateur pour être rattaché à une ferme avant d'accéder au tableau de bord.</p>
+    </div>
+</div>
+{% else %}
 <div class="dashboard-container">
     <h1>🏠 Tableau de bord</h1>
     <p style="color: #7f8c8d; margin-bottom: 20px;">Bienvenue, {{ user.get_full_name|default:user.username }} !</p>
@@ -352,4 +360,5 @@
         });
     }
 </script>
+{% endif %}
 {% endblock %}

@@ -82,8 +82,8 @@ class User(AbstractUser):
     def clean(self):
         super().clean()
 
-        # 🔴 Un utilisateur doit appartenir à une ferme
-        if not self.ferme:
+        # � P0.4 : Les superusers sont des comptes plateforme, pas des comptes métier
+        if not self.ferme and not self.is_superuser:
             raise ValidationError("Un utilisateur doit être rattaché à une ferme.")
 
         # 🔴 Un seul ADMIN par ferme

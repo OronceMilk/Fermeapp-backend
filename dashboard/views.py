@@ -22,12 +22,15 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'dashboard/dashboard.html'
     
     def get_context_data(self, **kwargs):
-        # 🔥 ERREUR VOLONTAIRE POUR TEST SENTRY
-raise Exception("Test Sentry - erreur volontaire")
         context = super().get_context_data(**kwargs)
         context['date_today'] = timezone.now()
         user = self.request.user
-        
+
+        # 🔥 P0.3 : Vérifier que l'utilisateur a une ferme
+        if not user.ferme:
+            context['no_ferme'] = True
+            return context
+
         # 🔥 CACHE (60 secondes pour éviter les calculs trop fréquents)
         cache_key = f"dashboard_v2_{user.id}_{user.ferme.id}"
         data = cache.get(cache_key)

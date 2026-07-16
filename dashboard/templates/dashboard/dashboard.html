@@ -248,6 +248,7 @@
 {{ stock_evolution.sorties|json_script:"stock-sorties" }}
 {{ depenses_par_produit.labels|json_script:"depenses-labels" }}
 {{ depenses_par_produit.valeurs|json_script:"depenses-valeurs" }}
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}

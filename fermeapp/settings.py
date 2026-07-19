@@ -140,7 +140,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # ============================================
 # SECURITE PRODUCTION
 # ============================================
-if not DEBUG:
+if not DEBUG and not os.environ.get('PYTEST_RUNNING'):
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True

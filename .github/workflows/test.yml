@@ -30,6 +30,7 @@ jobs:
       DJANGO_DEBUG: "False"
       DJANGO_ALLOWED_HOSTS: "localhost"
       DATABASE_URL: "postgres://fermeapp_ci:ci_password_temporaire@localhost:5432/fermeapp_test"
+      PYTEST_RUNNING: "True"
 
     steps:
       - uses: actions/checkout@v4

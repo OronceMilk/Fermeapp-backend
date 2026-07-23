@@ -86,6 +86,10 @@ class CultureParcelle(models.Model):
         
         if self.date_recolte_reelle and self.date_recolte_reelle < self.date_semis:
             raise ValidationError("La date de récolte réelle doit être après la date de semis.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return f"{self.culture.nom} - {self.parcelle.nom} (semis: {self.date_semis})"
@@ -136,6 +140,10 @@ class ActiviteAgricole(models.Model):
         
         if self.date > timezone.now().date():
             raise ValidationError("La date ne peut pas être dans le futur.")
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return f"{self.get_type_display()} - {self.culture_parcelle} - {self.date}"

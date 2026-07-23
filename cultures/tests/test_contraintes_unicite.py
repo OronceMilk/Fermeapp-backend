@@ -17,7 +17,8 @@ def test_meme_nom_parcelle_fermes_differentes_accepte(ferme, ferme_autre):
     assert p2.pk is not None
 
 def test_deux_semis_meme_parcelle_meme_date_refuse(parcelle, culture):
+    from django.core.exceptions import ValidationError
+
     CultureParcelle.objects.create(parcelle=parcelle, culture=culture, date_semis=date.today())
-    with pytest.raises(IntegrityError):
-        with transaction.atomic():
-            CultureParcelle.objects.create(parcelle=parcelle, culture=culture, date_semis=date.today())
+    with pytest.raises(ValidationError):
+        CultureParcelle.objects.create(parcelle=parcelle, culture=culture, date_semis=date.today())

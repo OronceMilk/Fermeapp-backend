@@ -11,7 +11,17 @@ from datetime import date, timedelta
 from accounts.decorators import admin_required
 from .models import Animal, Espece, LotPondeuses, RapportJournalier, Traitement
 from .forms import AnimalForm, LotForm, RapportJournalierForm, TraitementForm
-
+from .services import (
+    get_animaux_ferme, get_stats_cheptel, get_lots_avec_comptage,
+    creer_animal, mettre_a_jour_animal,
+    get_traitements_ferme, get_alertes_rappel, creer_traitement,
+)
+from .services import (
+    get_animaux_ferme, get_stats_cheptel, get_lots_avec_comptage,
+    creer_animal, mettre_a_jour_animal,
+    get_traitements_ferme, get_alertes_rappel, creer_traitement,
+    get_rapports_ferme, get_stats_rapports_mois, creer_lot,
+)
 
 # ==============================
 # ANIMAUX
@@ -72,10 +82,10 @@ class AnimalCreateView(LoginRequiredMixin, CreateView):
         return kwargs
     
     def form_valid(self, form):
-        form.instance.ferme = self.request.user.ferme
-        form.instance.createur = self.request.user
+        animal = creer_animal(form, ferme=self.request.user.ferme, createur=self.request.user)
+        self.object = animal
         messages.success(self.request, "✅ Animal ajouté avec succès !")
-        return super().form_valid(form)
+        return redirect(self.get_success_url())
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -98,18 +108,7 @@ class AnimalUpdateView(LoginRequiredMixin, UpdateView):
         return kwargs
     
     def form_valid(self, form):
-        # 🔥 Sauvegarder sans commit pour préserver createur
-        instance = form.save(commit=False)
-        
-        # Récupérer et préserver le créateur original si l'animal existe
-        if instance.pk:
-            original_animal = Animal.objects.get(pk=instance.pk)
-            instance.createur = original_animal.createur
-        else:
-            instance.createur = self.request.user
-        
-        # Sauvegarder l'animal avec le createur préservé
-        instance.save()
+        mettre_a_jour_animal(form, self.request.user)
         messages.success(self.request, "✏️ Animal modifié avec succès !")
         return redirect(self.get_success_url())
     
@@ -142,14 +141,12 @@ class LotListView(LoginRequiredMixin, ListView):
     ordering = ['-date_mise_en_place']
     
     def get_queryset(self):
-        return LotPondeuses.objects.filter(ferme=self.request.user.ferme)
+        return get_lots_avec_comptage(self.request.user.ferme)
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        for lot in context['lots']:
-            lot.nb_animaux = Animal.objects.filter(lot=lot).count()
-        context['total_lots'] = LotPondeuses.objects.filter(ferme=self.request.user.ferme).count()
-        context['total_sujets'] = sum(lot.nombre_sujets for lot in LotPondeuses.objects.filter(ferme=self.request.user.ferme))
+        context['total_lots'] = context['lots'].count()
+        context['total_sujets'] = sum(lot.nombre_sujets for lot in context['lots'])
         return context
 
 
@@ -165,10 +162,9 @@ class LotCreateView(LoginRequiredMixin, CreateView):
         return kwargs
     
     def form_valid(self, form):
-        form.instance.ferme = self.request.user.ferme
-        form.instance.createur = self.request.user
+        creer_lot(form, ferme=self.request.user.ferme, createur=self.request.user)
         messages.success(self.request, f"✅ Lot '{form.instance.nom}' créé avec succès !")
-        return super().form_valid(form)
+        return redirect(self.get_success_url())
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -227,31 +223,18 @@ class RapportJournalierListView(LoginRequiredMixin, ListView):
     paginate_by = 30
     
     def get_queryset(self):
-        queryset = RapportJournalier.objects.filter(
-            ferme=self.request.user.ferme
-        ).order_by('-date')
-        
         annee = self.request.GET.get('annee')
         mois = self.request.GET.get('mois')
-        
-        if annee and annee.isdigit():
-            queryset = queryset.filter(date__year=int(annee))
-        if mois and mois.isdigit():
-            queryset = queryset.filter(date__month=int(mois))
-        
-        return queryset
+        return get_rapports_ferme(
+            ferme=self.request.user.ferme,
+            annee=int(annee) if annee and annee.isdigit() else None,
+            mois=int(mois) if mois and mois.isdigit() else None,
+        )
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        rapports_mois = self.get_queryset().filter(
-            date__year=date.today().year,
-            date__month=date.today().month
-        )
-        
-        context['total_morts_mois'] = rapports_mois.aggregate(Sum('nombre_morts'))['nombre_morts__sum'] or 0
-        context['total_oeufs_mois'] = rapports_mois.aggregate(Sum('oeufs_pondus'))['oeufs_pondus__sum'] or 0
-        context['moyenne_aliment'] = rapports_mois.aggregate(Avg('aliment_kg'))['aliment_kg__avg'] or 0
+        context.update(get_stats_rapports_mois(self.request.user.ferme))
         
         context['annees_disponibles'] = RapportJournalier.objects.filter(
             ferme=self.request.user.ferme
@@ -356,25 +339,12 @@ class TraitementListView(LoginRequiredMixin, ListView):
     paginate_by = 20
     
     def get_queryset(self):
-        # Récupérer tous les animaux de la ferme de l'utilisateur
-        animaux_ferme = Animal.objects.filter(ferme=self.request.user.ferme)
-        
-        # Filtrer les traitements par ces animaux
-        queryset = Traitement.objects.filter(
-            animal__in=animaux_ferme
-        ).select_related('animal', 'produit', 'operateur').order_by('-date')
-        
-        # Filtre par type
-        type_filter = self.request.GET.get('type')
-        if type_filter:
-            queryset = queryset.filter(type=type_filter)
-        
-        # Filtre par animal
         animal_filter = self.request.GET.get('animal')
-        if animal_filter and animal_filter.isdigit():
-            queryset = queryset.filter(animal_id=int(animal_filter))
-        
-        return queryset
+        return get_traitements_ferme(
+            ferme=self.request.user.ferme,
+            type_filtre=self.request.GET.get('type') or None,
+            animal_id=int(animal_filter) if animal_filter and animal_filter.isdigit() else None,
+        )
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -385,16 +355,9 @@ class TraitementListView(LoginRequiredMixin, ListView):
             statut='ACTIF'
         ).order_by('identifiant')
         
-        # Alertes : rappels de vaccins dans les 7 jours
-        today = date.today()
-        animaux_ferme = Animal.objects.filter(ferme=self.request.user.ferme)
+        context['alertes_rappel'] = get_alertes_rappel(self.request.user.ferme)
         
-        context['alertes_rappel'] = Traitement.objects.filter(
-            animal__in=animaux_ferme,
-            rappel_le__isnull=False,
-            rappel_le__gte=today,
-            rappel_le__lte=today + timedelta(days=7)
-        ).select_related('animal')
+        today = date.today()
         
         # Statistiques
         context['total_traitements'] = self.get_queryset().count()
@@ -421,10 +384,9 @@ class TraitementCreateView(LoginRequiredMixin, CreateView):
         return kwargs
     
     def form_valid(self, form):
-        form.instance.ferme = self.request.user.ferme
-        form.instance.operateur = self.request.user
+        creer_traitement(form, ferme=self.request.user.ferme, operateur=self.request.user)
         messages.success(self.request, f"✅ {form.instance.get_type_display()} enregistré pour {form.instance.animal.identifiant}")
-        return super().form_valid(form)
+        return redirect(self.get_success_url())
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

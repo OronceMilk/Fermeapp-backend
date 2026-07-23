@@ -185,6 +185,31 @@ LOGGING = {
 }
 
 # ============================================
+# CACHE (Redis pour production, LocMem en fallback)
+# ============================================
+REDIS_URL = env('REDIS_URL', default='')
+
+if REDIS_URL:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': REDIS_URL,
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                'CONNECTION_POOL_KWARGS': {
+                    'protocol': 2,
+                },
+            },
+            'TIMEOUT': 300,
+        }
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        }
+    }
+# ============================================
 # SENTRY
 # ============================================
 import sentry_sdk
@@ -210,3 +235,4 @@ CLOUDINARY_STORAGE = {
 
 if not DEBUG and CLOUDINARY_STORAGE['CLOUD_NAME']:
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+

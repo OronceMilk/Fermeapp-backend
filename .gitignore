@@ -34,8 +34,10 @@ Thumbs.db
 
 # Static files (ignorer tout SAUF finances.js)
 static/
-!static/js/
-!static/js/finances.js
+!finances/static/
+!finances/static/finances/
+!finances/static/finances/js/
+!finances/static/finances/js/finances.js
 
 # Logs
 *.log

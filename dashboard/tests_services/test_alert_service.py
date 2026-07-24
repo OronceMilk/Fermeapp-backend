@@ -7,7 +7,7 @@ pytestmark = pytest.mark.django_db
 
 def test_alerte_vaccin_generee_dans_les_7_jours(ferme, animal, produit, admin_user):
     Traitement.objects.create(
-        animal=animal, ferme=ferme, type="VACCIN", date=date.today(),
+        animal=animal, ferme=ferme, type="VACCIN", date=date.today() - timedelta(days=1),
         rappel_le=date.today() + timedelta(days=3), produit=produit, operateur=admin_user,
     )
     alertes = get_alertes(admin_user)
@@ -16,7 +16,7 @@ def test_alerte_vaccin_generee_dans_les_7_jours(ferme, animal, produit, admin_us
 
 def test_pas_alerte_vaccin_hors_fenetre_7_jours(ferme, animal, produit, admin_user):
     Traitement.objects.create(
-        animal=animal, ferme=ferme, type="VACCIN", date=date.today(),
+        animal=animal, ferme=ferme, type="VACCIN", date=date.today() - timedelta(days=1),
         rappel_le=date.today() + timedelta(days=20), produit=produit, operateur=admin_user,
     )
     alertes = get_alertes(admin_user)
@@ -25,9 +25,9 @@ def test_pas_alerte_vaccin_hors_fenetre_7_jours(ferme, animal, produit, admin_us
 
 def test_tri_priorite_danger_avant_info(ferme, animal, produit, admin_user):
     from cheptel.models import RapportJournalier
-    RapportJournalier.objects.create(ferme=ferme, date=date.today(), sujets_malades=2, createur=admin_user)
+    RapportJournalier.objects.create(ferme=ferme, date=date.today() - timedelta(days=1), sujets_malades=2, createur=admin_user)
     Traitement.objects.create(
-        animal=animal, ferme=ferme, type="VACCIN", date=date.today(),
+        animal=animal, ferme=ferme, type="VACCIN", date=date.today() - timedelta(days=1),
         rappel_le=date.today() + timedelta(days=6), produit=produit, operateur=admin_user,
     )
     alertes = get_alertes(admin_user)

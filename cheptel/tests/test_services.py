@@ -219,7 +219,7 @@ def test_get_rapports_ferme_filtre_par_annee_et_mois(ferme, admin_user):
 
 def test_get_stats_rapports_mois_agrege_le_mois_en_cours(ferme, admin_user):
     from cheptel.models import RapportJournalier
-    today = date.today()
+    today = date.today() - timedelta(days=1)
     RapportJournalier.objects.create(
         ferme=ferme, date=today, createur=admin_user,
         nombre_morts=2, oeufs_pondus=50, aliment_kg=10,

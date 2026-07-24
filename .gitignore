@@ -32,14 +32,11 @@ Thumbs.db
 /media/
 /staticfiles/
 
-# Static files (ignorer tout SAUF finances.js)
+# Static files (ignorer tout SAUF les fichiers JS essentiels)
+/staticfiles/
 /static/
-/static/js/
-/static/js/notifications.js
-!finances/static/
-!finances/static/finances/
-!finances/static/finances/js/
-!finances/static/finances/js/finances.js
+!static/js/
+!static/js/finances.js
 
 # Logs
 *.log

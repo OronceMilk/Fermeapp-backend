@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'cheptel',
     'cultures',
     'stocks',
+    'finances',
     'dashboard',
 ]
 

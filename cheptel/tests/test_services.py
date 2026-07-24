@@ -40,7 +40,7 @@ def test_get_lots_avec_comptage_annotation_correcte(ferme, espece):
     from datetime import date
     lot = LotPondeuses.objects.create(
         nom="Lot X", ferme=ferme, espece=espece,
-        nombre_sujets=10, date_mise_en_place=date.today(),
+        nombre_sujets=10, date_mise_en_place=date.today() - timedelta(days=1),
     )
     Animal.objects.create(identifiant="A1", ferme=ferme, espece=espece, sexe="F", lot=lot)
     Animal.objects.create(identifiant="A2", ferme=ferme, espece=espece, sexe="M", lot=lot)
@@ -57,7 +57,7 @@ def test_get_lots_avec_comptage_une_seule_requete(ferme, espece, django_assert_m
     for i in range(5):
         LotPondeuses.objects.create(
             nom=f"Lot {i}", ferme=ferme, espece=espece,
-            nombre_sujets=10, date_mise_en_place=date.today(),
+            nombre_sujets=10, date_mise_en_place=date.today() - timedelta(days=1),
         )
 
     with django_assert_max_num_queries(1):
@@ -150,11 +150,11 @@ def test_get_traitements_ferme_isole_par_ferme(ferme, ferme_autre, animal, produ
         identifiant="A-AUTRE", ferme=ferme_autre, espece=animal.espece, sexe="M",
     )
     Traitement.objects.create(
-        animal=animal, ferme=ferme, type="VACCIN", date=date.today(),
+        animal=animal, ferme=ferme, type="VACCIN", date=date.today() - timedelta(days=1),
         produit=produit, operateur=admin_user,
     )
     Traitement.objects.create(
-        animal=animal_autre_ferme, ferme=ferme_autre, type="VACCIN", date=date.today(),
+        animal=animal_autre_ferme, ferme=ferme_autre, type="VACCIN", date=date.today() - timedelta(days=1),
         produit=produit, operateur=admin_user,
     )
 
@@ -165,11 +165,11 @@ def test_get_traitements_ferme_isole_par_ferme(ferme, ferme_autre, animal, produ
 def test_get_traitements_ferme_filtre_par_type(ferme, animal, produit, admin_user):
     from cheptel.models import Traitement
     Traitement.objects.create(
-        animal=animal, ferme=ferme, type="VACCIN", date=date.today(),
+        animal=animal, ferme=ferme, type="VACCIN", date=date.today() - timedelta(days=1),
         produit=produit, operateur=admin_user,
     )
     Traitement.objects.create(
-        animal=animal, ferme=ferme, type="TRAITEMENT", date=date.today(),
+        animal=animal, ferme=ferme, type="TRAITEMENT", date=date.today() - timedelta(days=1),
         produit=produit, operateur=admin_user,
     )
 
@@ -181,11 +181,11 @@ def test_get_traitements_ferme_filtre_par_type(ferme, animal, produit, admin_use
 def test_get_alertes_rappel_respecte_la_fenetre_de_7_jours(ferme, animal, produit, admin_user):
     from cheptel.models import Traitement
     Traitement.objects.create(
-        animal=animal, ferme=ferme, type="VACCIN", date=date.today(),
+        animal=animal, ferme=ferme, type="VACCIN", date=date.today() - timedelta(days=1),
         rappel_le=date.today() + timedelta(days=3), produit=produit, operateur=admin_user,
     )
     Traitement.objects.create(
-        animal=animal, ferme=ferme, type="VACCIN", date=date.today(),
+        animal=animal, ferme=ferme, type="VACCIN", date=date.today() - timedelta(days=1),
         rappel_le=date.today() + timedelta(days=15), produit=produit, operateur=admin_user,
     )
 
@@ -196,7 +196,7 @@ def test_get_alertes_rappel_respecte_la_fenetre_de_7_jours(ferme, animal, produi
 def test_creer_traitement_pas_de_double_enregistrement(ferme, animal, produit, admin_user):
     from cheptel.models import Traitement
     form = TraitementForm(data={
-        'animal': animal.id, 'type': 'VACCIN', 'date': date.today(),
+        'animal': animal.id, 'type': 'VACCIN', 'date': date.today() - timedelta(days=1),
         'produit': produit.id, 'dose': '2ml',
     }, user=admin_user)
     assert form.is_valid(), form.errors
@@ -247,7 +247,7 @@ def test_creer_lot_pas_de_double_enregistrement(ferme, espece, admin_user):
     from cheptel.models import LotPondeuses
     form = LotForm(data={
         'nom': 'Lot Test Service', 'espece': espece.id,
-        'nombre_sujets': 20, 'date_mise_en_place': date.today(),
+        'nombre_sujets': 20, 'date_mise_en_place': date.today() - timedelta(days=1),
     }, user=admin_user)
     assert form.is_valid(), form.errors
 

@@ -5,6 +5,7 @@ from cultures.models import ActiviteAgricole
 
 pytestmark = pytest.mark.django_db
 
+
 def test_date_future_detectee_par_full_clean(culture_parcelle):
     activite = ActiviteAgricole(
         culture_parcelle=culture_parcelle, type="IRRIGATION",
@@ -12,6 +13,7 @@ def test_date_future_detectee_par_full_clean(culture_parcelle):
     )
     with pytest.raises(ValidationError):
         activite.full_clean()
+
 
 def test_creation_orm_directe_valide_desormais_automatiquement(culture_parcelle):
     """Sprint 11 (P1.7) : même correctif que CultureParcelle."""

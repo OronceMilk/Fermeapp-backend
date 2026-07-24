@@ -1,5 +1,5 @@
 import pytest
-from datetime import date
+from datetime import date, timedelta
 from cultures.models import Parcelle, Culture, CultureParcelle
 
 @pytest.fixture
@@ -15,5 +15,5 @@ def culture():
 @pytest.fixture
 def culture_parcelle(parcelle, culture):
     return CultureParcelle.objects.create(
-        parcelle=parcelle, culture=culture, date_semis=date.today(),
+        parcelle=parcelle, culture=culture, date_semis=date.today() - timedelta(days=1),
     )

@@ -5,6 +5,7 @@ from cultures.models import CultureParcelle
 
 pytestmark = pytest.mark.django_db
 
+
 def test_creation_orm_directe_valide_desormais_automatiquement(parcelle, culture):
     """
     Sprint 11 (P1.7) : CultureParcelle appelle maintenant full_clean() dans save(),
@@ -14,27 +15,30 @@ def test_creation_orm_directe_valide_desormais_automatiquement(parcelle, culture
     with pytest.raises(ValidationError):
         CultureParcelle.objects.create(
             parcelle=parcelle, culture=culture,
-            date_semis=date.today(),
-            date_recolte_prevue=date.today() - timedelta(days=5),
+            date_semis=date.today() - timedelta(days=1),
+            date_recolte_prevue=date.today() - timedelta(days=6),
         )
+
 
 def test_full_clean_explicite_detecte_bien_incoherence(parcelle, culture):
     cp = CultureParcelle(
         parcelle=parcelle, culture=culture,
-        date_semis=date.today(),
-        date_recolte_prevue=date.today() - timedelta(days=5),
+        date_semis=date.today() - timedelta(days=1),
+        date_recolte_prevue=date.today() - timedelta(days=6),
     )
     with pytest.raises(ValidationError):
         cp.full_clean()
 
+
 def test_recolte_reelle_avant_semis_detectee_par_full_clean(parcelle, culture):
     cp = CultureParcelle(
         parcelle=parcelle, culture=culture,
-        date_semis=date.today(),
-        date_recolte_reelle=date.today() - timedelta(days=1),
+        date_semis=date.today() - timedelta(days=1),
+        date_recolte_reelle=date.today() - timedelta(days=2),
     )
     with pytest.raises(ValidationError):
         cp.full_clean()
+
 
 def test_dates_coherentes_acceptees(parcelle, culture):
     cp = CultureParcelle(
@@ -55,7 +59,7 @@ def test_creation_via_formulaire_fonctionne_toujours(parcelle, culture, admin_us
     form = CultureParcelleForm(data={
         'parcelle': parcelle.id,
         'culture': culture.id,
-        'date_semis': date.today(),
+        'date_semis': date.today() - timedelta(days=1),
     }, user=admin_user)
     assert form.is_valid(), form.errors
     cp = form.save()

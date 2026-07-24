@@ -14,6 +14,7 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls', namespace='dashboard')),
     path('stocks/', include('stocks.urls', namespace='stocks')),
     path('stock/', include(('stocks.urls', 'stocks'), namespace='stock_alias')),
+    path('finances/', include('finances.urls', namespace='finances')),
 ]
 
 if settings.DEBUG:

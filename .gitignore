@@ -33,7 +33,9 @@ Thumbs.db
 /staticfiles/
 
 # Static files (ignorer tout SAUF finances.js)
-static/
+/static/
+/static/js/
+/static/js/notifications.js
 !finances/static/
 !finances/static/finances/
 !finances/static/finances/js/

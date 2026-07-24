@@ -20,6 +20,7 @@ class StockViewsTest(TestCase):
         )
         self.user = User.objects.create_user(
             username="adminstock",
+            email="adminstock@test.com",
             password="pass123",
             role="ADMIN",
             ferme=self.ferme,

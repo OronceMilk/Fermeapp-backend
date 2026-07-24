@@ -131,3 +131,32 @@ class UserModelTest(TestCase):
         )
         
         self.assertEqual(user2.role, "ADMIN")  # Pas d'erreur
+
+# ============================================
+# NOUVEAUX TESTS P14 (pytest style)
+# ============================================
+import pytest
+from django.db import IntegrityError, transaction
+
+@pytest.mark.django_db
+def test_deux_utilisateurs_meme_email_refuse(ferme):
+    User.objects.create_user(
+        username="user1", email="doublon@test.com", password="Test1234!", ferme=ferme,
+    )
+    with pytest.raises((IntegrityError, ValidationError)):
+        with transaction.atomic():
+            User.objects.create_user(
+                username="user2", email="doublon@test.com", password="Test1234!", ferme=ferme,
+            )
+
+@pytest.mark.django_db
+def test_superuser_sans_email_toujours_possible_si_champ_fourni(ferme):
+    u = User.objects.create_superuser(
+        username="super_test_p14", email="super_p14@test.com", password="Test1234!",
+    )
+    assert u.pk is not None
+
+@pytest.mark.django_db
+def test_fixtures_existantes_compatibles(admin_user):
+    assert admin_user.pk is not None
+    assert admin_user.email  # non vide

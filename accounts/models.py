@@ -46,6 +46,7 @@ class User(AbstractUser):
         ('EMPLOYE', 'Employé'),
     ]
 
+    email = models.EmailField(unique=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='EMPLOYE')
 
     phone = models.CharField(max_length=20, blank=True)

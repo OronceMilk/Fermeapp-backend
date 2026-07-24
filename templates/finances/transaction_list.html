@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -85,5 +86,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="/static/js/finances.js"></script>
+<script src="{% static 'js/finances.js' %}"></script>
 {% endblock %}

@@ -54,7 +54,7 @@ Prérequis : PostgreSQL et Redis installés localement (voir .env.example pour l
 ```bash
 pytest                                    # suite complète
 pytest --cov=. --cov-report=term-missing  # avec couverture
-76 tests couvrant : les règles métier (`cheptel`, `cultures`, `stocks`), l'isolation multi-ferme, la concurrence sur les mouvements de stock, et les services du dashboard.
+84 tests couvrant : les règles métier (`cheptel`, `cultures`, `stocks`), l'isolation multi-ferme, la concurrence sur les mouvements de stock, les services du dashboard, et le parcours d'inscription self-service (`accounts`).
 
 Déploiement
 Le projet est déployé sur Render. Variables d'environnement requises (voir .env.example) : DJANGO_SECRET_KEY, DJANGO_DEBUG, DJANGO_ALLOWED_HOSTS, DATABASE_URL, REDIS_URL, SENTRY_DSN, CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET.

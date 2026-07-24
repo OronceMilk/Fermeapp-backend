@@ -58,7 +58,28 @@ Chaque utilisateur appartient à une `Ferme` (`accounts.models.User.ferme`). Tou
 
 \*\*Exception documentée\*\* : un superuser Django (compte plateforme) n'est rattaché à aucune ferme — voir `accounts/models.py::User.clean()`.
 
+## Onboarding self-service (P14)
 
+Depuis P14, la création d'une ferme et de son premier compte administrateur ne nécessite plus d'intervention manuelle via le shell Django — un visiteur peut créer son exploitation de façon autonome.
+Visiteur
+│
+▼
+Formulaire d'inscription (/accounts/inscription/)
+│ InscriptionForm : données ferme + données admin en une seule saisie
+▼
+accounts/services.py::inscrire_nouvelle_ferme()
+│ transaction.atomic() — Ferme et User créés ensemble ou pas du tout
+▼
+Connexion automatique + redirection vers le Dashboard
+
+
+**Décision d'architecture — localisation de la logique** : comme pour `cheptel/services.py` et `stocks/services.py`, la logique métier vit dans une fonction de service (`inscrire_nouvelle_ferme`), pas dans la vue. La vue (`InscriptionView`, `FormView`) reste responsable uniquement du cycle requête/réponse et de la traduction des exceptions métier en erreurs de formulaire.
+
+**Garantie transactionnelle** : `inscrire_nouvelle_ferme()` est décorée `@transaction.atomic`. Sans cette garantie, un échec de validation sur le `User` après la création de la `Ferme` laisserait une ferme orpheline en base — un état non récupérable depuis l'interface, puisqu'aucun flux ne permet de rattacher un administrateur à une ferme existante après coup. Testé explicitement (`test_rollback_si_validation_echoue`).
+
+**Décision d'architecture — unicité de l'email `User`** : `email` est désormais `unique=True` sur le modèle `User` (auparavant hérité d'`AbstractUser` sans contrainte). Décision prise en anticipation d'un futur mécanisme de récupération de compte par email, et pour fermer la faille qu'une validation au seul niveau formulaire aurait laissée ouverte à tout autre point d'entrée (admin Django, scripts, future API). Vérifié avant migration : aucun doublon ni email vide en base (locale et production) au moment du changement.
+
+**Défense en profondeur** : la vue catche à la fois `EmailDejaUtiliseException` (levée volontairement par le service) et `ValidationError` générique (filet de sécurité pour toute violation de contrainte modèle non anticipée par le formulaire — découvert en pratique avec la validation du format de `username`, qui n'était initialement vérifiée qu'au niveau du modèle, pas du formulaire).
 
 \## Couche services
 

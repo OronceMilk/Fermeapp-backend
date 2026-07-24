@@ -2,6 +2,7 @@ import pytest
 from decimal import Decimal
 from dashboard.services.finance_service import get_finances
 from stocks.models import ProduitStock, MouvementStock
+from django.db.models.functions import TruncMonth
 
 pytestmark = pytest.mark.django_db
 

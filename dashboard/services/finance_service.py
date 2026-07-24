@@ -3,7 +3,7 @@ from decimal import Decimal
 from datetime import date as date_today
 from stocks.models import MouvementStock
 from finances.models import Transaction
-
+from django.db.models.functions import TruncMonth
 
 def get_finances(user):
     """
@@ -72,7 +72,39 @@ def get_finances_mois(user, annee=None, mois=None):
         'depenses': float(depenses),
         'marge': float(recettes - depenses),
     }
+def get_evolution_annuelle(user, annee=None):
+    """Recettes et dépenses réelles, mois par mois, pour le graphique de la page finances."""
+    from datetime import date as date_today
+    from django.db.models import Sum, F
+    from decimal import Decimal
+    from stocks.models import MouvementStock
+    from finances.models import Transaction
 
+    today = date_today.today()
+    annee = annee or today.year
+    ferme = user.ferme
+
+    def _par_mois(queryset):
+        resultats = queryset.annotate(mois=TruncMonth('date')).values('mois').annotate(
+            total=Sum('montant')
+        ).order_by('mois')
+        return {r['mois'].month: float(r['total']) for r in resultats}
+
+    recettes_mois = _par_mois(Transaction.objects.filter(ferme=ferme, type='RECETTE', date__year=annee))
+    depenses_transactions_mois = _par_mois(Transaction.objects.filter(ferme=ferme, type='DEPENSE', date__year=annee))
+
+    depenses_stock_brut = MouvementStock.objects.filter(
+        produit__ferme=ferme, type='ENTREE', date__year=annee
+    ).annotate(mois=TruncMonth('date')).values('mois').annotate(
+        total=Sum(F('quantite') * F('prix_unitaire'))
+    ).order_by('mois')
+    depenses_stock_mois = {r['mois'].month: float(r['total']) for r in depenses_stock_brut}
+
+    return {
+        'labels': ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'],
+        'recettes': [recettes_mois.get(m, 0) for m in range(1, 13)],
+        'depenses': [depenses_transactions_mois.get(m, 0) + depenses_stock_mois.get(m, 0) for m in range(1, 13)],
+    }
 
 def get_depenses_par_produit(user):
     """

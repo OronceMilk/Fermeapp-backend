@@ -31,7 +31,11 @@ Thumbs.db
 # Django
 /media/
 /staticfiles/
-/static/
+
+# Static files (ignorer tout SAUF finances.js)
+static/
+!static/js/
+!static/js/finances.js
 
 # Logs
 *.log

@@ -1,0 +1,109 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Créer mon exploitation — FermeApp</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy:  '#1e3a5f',
+            lime:  '#7cb518',
+            'lime-light': '#e8f5c8',
+            'navy-dark':  '#162d4a',
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #1e3a5f;
+      background-image: repeating-linear-gradient(45deg, transparent, transparent 28px, rgba(255,255,255,0.04) 28px, rgba(255,255,255,0.04) 30px),
+                         repeating-linear-gradient(-45deg, transparent, transparent 28px, rgba(255,255,255,0.04) 28px, rgba(255,255,255,0.04) 30px);
+    }
+    input:focus { outline: none; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center px-4 py-10">
+
+  <div class="text-center mb-8">
+    <h1 class="text-4xl font-extrabold tracking-tight">
+      <span class="text-white">Ferme</span><span style="color:#7cb518;">App</span>
+    </h1>
+    <p class="mt-2 text-sm italic" style="color: rgba(255,255,255,0.65);">
+      Créez votre exploitation en quelques minutes
+    </p>
+  </div>
+
+  <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden">
+    <div class="py-5 px-8 text-center" style="background-color: #7cb518;">
+      <h2 class="text-2xl font-bold italic" style="color: #1e3a5f;">Créer mon exploitation</h2>
+    </div>
+
+    <div class="px-8 py-8 space-y-5">
+
+      {% if form.non_field_errors %}
+      <div class="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+        {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+      </div>
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <p class="text-xs font-bold uppercase tracking-widest mb-3" style="color:#7cb518;">Votre ferme</p>
+
+        {% for field in form %}
+          {% if field.name|slice:":6" == "ferme_" %}
+          <div class="mb-4">
+            <label class="block text-xs font-semibold tracking-widest uppercase mb-2" style="color:#1e3a5f;">
+              {{ field.label }}
+            </label>
+            {{ field }}
+            {% for error in field.errors %}
+              <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
+        {% endfor %}
+
+        <p class="text-xs font-bold uppercase tracking-widest mt-6 mb-3" style="color:#7cb518;">Votre compte administrateur</p>
+
+        {% for field in form %}
+          {% if field.name|slice:":6" == "admin_" %}
+          <div class="mb-4">
+            <label class="block text-xs font-semibold tracking-widest uppercase mb-2" style="color:#1e3a5f;">
+              {{ field.label }}
+            </label>
+            {{ field }}
+            {% for error in field.errors %}
+              <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
+        {% endfor %}
+
+        <button type="submit"
+          class="w-full py-3.5 px-4 rounded-lg text-white font-semibold text-sm mt-4
+                 transition-all duration-200 hover:brightness-110 active:scale-[0.98] shadow-md"
+          style="background-color: #7cb518;">
+          Créer mon exploitation
+        </button>
+      </form>
+
+      <p class="text-center text-sm mt-4" style="color:#1e3a5f;">
+        Déjà un compte ?
+        <a href="{% url 'accounts:login' %}" class="font-semibold" style="color:#7cb518;">Se connecter</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

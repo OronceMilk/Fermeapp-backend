@@ -9,6 +9,7 @@ urlpatterns = [
     # Authentification
     path('login/', views.CustomLoginView.as_view(), name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('inscription/', views.InscriptionView.as_view(), name='inscription'),
     
     # 🔥 Redirections vers dashboard unifié
     path('admin-dashboard/', lambda request: redirect('dashboard:home'), name='admin_dashboard'),

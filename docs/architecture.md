@@ -97,6 +97,15 @@ Introduite progressivement (Sprints 8-11) sur les modules où elle apportait une
 
 \- \*\*`cultures`\*\* : après audit, jugé ne pas nécessiter de couche services dédiée (vues déjà courtes, sans duplication ni N+1) — un correctif ciblé (validation `full\_clean()` automatique) a suffi plutôt qu'un refactor complet, décision documentée pour éviter la complexité artificielle.
 
+## Verrouillage UX — décision de ne pas introduire Crispy Forms
+
+**Décision prise** : FermeApp n'utilise pas Crispy Forms (ni aucune autre bibliothèque de rendu de formulaires tierce). Les formulaires sont stylés manuellement via une combinaison de :
+
+- **CSS global** dans `base.html` pour les champs de base (`input[type="text"]`, `select`, `textarea`...), qui s'applique à tout formulaire sans effort supplémentaire.
+- **Widgets Django personnalisés** pour les cas particuliers (`NumberInput` avec `inputmode`, `TextInput` avec `type="tel"`...).
+- **Styles inline** uniquement sur `login.html` (en cours de migration vers le CSS global).
+
+**Seuil de bascule** : si un jour un formulaire devient suffisamment complexe pour justifier un rendu conditionnel lourd (champs qui apparaissent/disparaissent selon le type de transaction, listes déroulantes dynamiques, etc.), la question sera réévaluée. Ce seuil n'est pas atteint aujourd'hui.
 
 
 \## Validation des données

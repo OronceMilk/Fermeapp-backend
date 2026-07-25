@@ -46,7 +46,7 @@ class InscriptionView(FormView):
 
 class CustomLoginView(LoginView):
     """Vue de connexion professionnelle avec CBV"""
-    template_name = 'accounts/login.html'
+    template_name = 'accounts/login_v2.html'
     authentication_form = CustomAuthenticationForm
     redirect_authenticated_user = True
     

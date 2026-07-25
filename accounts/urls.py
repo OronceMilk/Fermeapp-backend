@@ -1,13 +1,13 @@
 # accounts/urls.py
 from django.urls import path
 from . import views
-from django.shortcuts import redirect  # ← Ajouter cette ligne
+from django.shortcuts import redirect
 
 app_name = 'accounts'
 
 urlpatterns = [
     # Authentification
-    path('login/', views.CustomLoginView.as_view(), name='login'),
+    path('connexion/', views.CustomLoginView.as_view(), name='login'),  # 🔥 MODIFIÉ
     path('logout/', views.logout_view, name='logout'),
     path('inscription/', views.InscriptionView.as_view(), name='inscription'),
     

@@ -11,10 +11,16 @@
       theme: {
         extend: {
           colors: {
-            navy:  '#1e3a5f',
-            lime:  '#7cb518',
-            'lime-light': '#e8f5c8',
-            'navy-dark':  '#162d4a',
+            navy: '#17324D',
+            lime: '#84CC16',
+            'lime-dark': '#65A30D',
+            slate: {
+              50: '#F6F8FB',
+              200: '#E2E8F0',
+              500: '#64748B',
+              700: '#0F172A',
+              800: '#0F172A',
+            }
           },
           fontFamily: { sans: ['Inter', 'sans-serif'] }
         }
@@ -25,33 +31,143 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     body {
-      background-color: #1e3a5f;
-      background-image: repeating-linear-gradient(45deg, transparent, transparent 28px, rgba(255,255,255,0.04) 28px, rgba(255,255,255,0.04) 30px),
-                         repeating-linear-gradient(-45deg, transparent, transparent 28px, rgba(255,255,255,0.04) 28px, rgba(255,255,255,0.04) 30px);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(132, 204, 22, 0.13), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(23, 50, 77, 0.33), transparent 45%),
+        linear-gradient(135deg, #0f2942, #17324d, #234b73);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
     }
-    input:focus { outline: none; }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      backdrop-filter: blur(100px);
+      background:
+        radial-gradient(circle at 10% 20%, rgba(132, 204, 22, 0.15), transparent 25%),
+        radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.08), transparent 30%);
+      pointer-events: none;
+    }
+    .card {
+      animation: fade .7s ease;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(24px);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 32px;
+      max-width: 560px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(25px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .form-control {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 14px;
+      border: 1px solid #dbe4ef;
+      background: #fff;
+      transition: 0.25s;
+      font-size: 15px;
+      color: #0f172a;
+    }
+    .form-control:focus {
+      border-color: #84cc16;
+      box-shadow: 0 0 0 4px rgba(132, 204, 22, 0.15);
+      outline: none;
+    }
+    .form-control::placeholder {
+      color: #94a3b8;
+    }
+    .section-card {
+      background: #f8fafc;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      padding: 1.5rem;
+      transition: 0.2s;
+    }
+    .section-card:hover {
+      border-color: #84cc16;
+    }
+    .badge-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(132, 204, 22, 0.1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+    }
+    .btn-gradient {
+      background: linear-gradient(135deg, #84cc16, #65a30d);
+      transition: 0.3s;
+      box-shadow: 0 12px 30px rgba(132, 204, 22, 0.35);
+    }
+    .btn-gradient:hover {
+      background: linear-gradient(135deg, #65a30d, #4d7c0f);
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px rgba(132, 204, 22, 0.4);
+    }
+    .btn-gradient:active {
+      transform: translateY(0);
+    }
+    .error-box {
+      border-radius: 16px;
+      border-left: 4px solid #ef4444;
+      background: #fef2f2;
+      padding: 12px 16px;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
+    }
+    .progress-bar {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(to right, #84cc16, #65a30d);
+      border-radius: 9999px;
+    }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center px-4 py-10">
+<body>
 
-  <div class="text-center mb-8">
-    <h1 class="text-4xl font-extrabold tracking-tight">
-      <span class="text-white">Ferme</span><span style="color:#7cb518;">App</span>
-    </h1>
-    <p class="mt-2 text-sm italic" style="color: rgba(255,255,255,0.65);">
-      Créez votre exploitation en quelques minutes
-    </p>
-  </div>
-
-  <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden">
-    <div class="py-5 px-8 text-center" style="background-color: #7cb518;">
-      <h2 class="text-2xl font-bold italic" style="color: #1e3a5f;">Créer mon exploitation</h2>
+  <div class="card">
+    <div class="px-8 pt-8 pb-6 text-center bg-gradient-to-r from-lime to-lime-dark">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/20 backdrop-blur text-3xl">
+        🌿
+      </div>
+      <h2 class="mt-4 text-3xl font-extrabold text-white">Créer votre exploitation</h2>
+      <p class="text-white/80 mt-2 text-sm">Commencez en moins de deux minutes</p>
     </div>
 
-    <div class="px-8 py-8 space-y-5">
+    <div class="p-8 space-y-6">
+
+      <!-- Indicateur de progression -->
+      <div>
+        <div class="flex justify-between text-xs font-medium text-slate-500">
+          <span>Configuration</span>
+          <span>100%</span>
+        </div>
+        <div class="mt-2 progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+      </div>
 
       {% if form.non_field_errors %}
-      <div class="px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+      <div class="error-box text-sm text-red-700">
         {% for error in form.non_field_errors %}{{ error }}{% endfor %}
       </div>
       {% endif %}
@@ -59,51 +175,60 @@
       <form method="post" novalidate>
         {% csrf_token %}
 
-        <p class="text-xs font-bold uppercase tracking-widest mb-3" style="color:#7cb518;">Votre ferme</p>
-
-        {% for field in form %}
-          {% if field.name|slice:":6" == "ferme_" %}
-          <div class="mb-4">
-            <label class="block text-xs font-semibold tracking-widest uppercase mb-2" style="color:#1e3a5f;">
-              {{ field.label }}
-            </label>
-            {{ field }}
-            {% for error in field.errors %}
-              <p class="text-xs text-red-600 mt-1">{{ error }}</p>
-            {% endfor %}
+        <!-- Section Ferme -->
+        <div class="section-card">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="badge-icon">🏡</div>
+            <div>
+              <h3 class="font-bold text-slate-800">Votre exploitation</h3>
+              <p class="text-sm text-slate-500">Informations générales</p>
+            </div>
           </div>
-          {% endif %}
-        {% endfor %}
+          {% for field in form %}
+            {% if field.name|slice:":6" == "ferme_" %}
+            <div class="mb-4">
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ field.label }}</label>
+              {{ field }}
+              {% for error in field.errors %}
+                <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
 
-        <p class="text-xs font-bold uppercase tracking-widest mt-6 mb-3" style="color:#7cb518;">Votre compte administrateur</p>
-
-        {% for field in form %}
-          {% if field.name|slice:":6" == "admin_" %}
-          <div class="mb-4">
-            <label class="block text-xs font-semibold tracking-widest uppercase mb-2" style="color:#1e3a5f;">
-              {{ field.label }}
-            </label>
-            {{ field }}
-            {% for error in field.errors %}
-              <p class="text-xs text-red-600 mt-1">{{ error }}</p>
-            {% endfor %}
+        <!-- Section Compte Admin -->
+        <div class="section-card">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="badge-icon">👤</div>
+            <div>
+              <h3 class="font-bold text-slate-800">Votre compte administrateur</h3>
+              <p class="text-sm text-slate-500">Identifiants de connexion</p>
+            </div>
           </div>
-          {% endif %}
-        {% endfor %}
+          {% for field in form %}
+            {% if field.name|slice:":6" == "admin_" %}
+            <div class="mb-4">
+              <label class="block text-sm font-semibold text-slate-700 mb-1.5">{{ field.label }}</label>
+              {{ field }}
+              {% for error in field.errors %}
+                <p class="text-xs text-red-600 mt-1">{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          {% endfor %}
+        </div>
 
-        <button type="submit"
-          class="w-full py-3.5 px-4 rounded-lg text-white font-semibold text-sm mt-4
-                 transition-all duration-200 hover:brightness-110 active:scale-[0.98] shadow-md"
-          style="background-color: #7cb518;">
-          Créer mon exploitation
+        <button type="submit" class="btn-gradient w-full rounded-2xl py-4 font-bold text-lg text-white transition duration-300 shadow-xl hover:shadow-2xl flex items-center justify-center gap-2">
+          <span>🚜</span> Créer mon exploitation
         </button>
       </form>
 
-      <p class="text-center text-sm mt-4" style="color:#1e3a5f;">
-        Déjà un compte ?
-        <a href="{% url 'accounts:login' %}" class="font-semibold" style="color:#7cb518;">Se connecter</a>
+      <p class="text-center text-sm text-slate-500 mt-2">
+        Déjà un compte ? <a href="{% url 'accounts:login' %}" class="font-semibold text-lime-600 hover:text-lime-dark transition">Se connecter</a>
       </p>
     </div>
   </div>
+
 </body>
 </html>

@@ -37,7 +37,10 @@ class InscriptionForm(forms.Form):
     ferme_nom = forms.CharField(max_length=255, label="Nom de la ferme")
     ferme_localisation = forms.CharField(max_length=255, label="Localisation")
     ferme_email = forms.EmailField(label="Email de la ferme")
-    ferme_telephone = forms.CharField(max_length=20, required=False, label="Téléphone (optionnel)")
+    ferme_telephone = forms.CharField(
+    max_length=20, required=False, label="Téléphone (optionnel)",
+    widget=forms.TextInput(attrs={'type': 'tel', 'inputmode': 'tel'}),
+)
 
     admin_username = forms.CharField(
         max_length=150,

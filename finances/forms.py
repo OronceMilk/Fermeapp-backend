@@ -9,4 +9,5 @@ class TransactionForm(forms.ModelForm):
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
             'commentaire': forms.Textarea(attrs={'rows': 3}),
+            'montant': forms.NumberInput(attrs={'inputmode': 'decimal', 'step': '0.01', 'min': '0'}),
         }

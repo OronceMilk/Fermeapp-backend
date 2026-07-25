@@ -88,6 +88,33 @@
       font-size: 0.75rem;
       font-weight: 600;
     }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"],
+    input[type="tel"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #d1d5db;
+      font-size: 0.875rem;
+      transition: border-color 0.15s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="number"]:focus,
+    input[type="date"]:focus,
+    input[type="tel"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #7cb518;
+    }
   </style>
 
   {% block extra_head %}{% endblock %}

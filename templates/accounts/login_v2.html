@@ -22,47 +22,125 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(132, 204, 22, 0.45);
+      border-radius: 20px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #84cc16;
+    }
+
+    /* ===== HTML ===== */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* ===== BODY ===== */
     body {
       min-height: 100vh;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
       background:
         radial-gradient(circle at 15% 20%, rgba(132, 204, 22, 0.18), transparent 28%),
         radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.06), transparent 35%),
         linear-gradient(135deg, #0f2942, #17324d, #244f7a);
       position: relative;
       display: flex;
-      align-items: center;
       justify-content: center;
-      padding: 1.5rem;
+      align-items: flex-start;
+      padding: 40px 20px;
       font-family: 'Inter', sans-serif;
       margin: 0;
-    }
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      backdrop-filter: blur(100px);
-      pointer-events: none;
+      scroll-behavior: smooth;
     }
 
+    /* ===== FOND ANIMÉ ===== */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: -20%;
+      background:
+        radial-gradient(circle, rgba(132, 204, 22, 0.09), transparent 60%),
+        radial-gradient(circle, rgba(255, 255, 255, 0.06), transparent 55%);
+      animation: floatBackground 18s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes floatBackground {
+      from { transform: translate(-30px, -20px) scale(1); }
+      to { transform: translate(40px, 30px) scale(1.15); }
+    }
+
+    /* ===== CARTE ===== */
     .card {
+      position: relative;
+      z-index: 1;
       animation: fade .7s ease;
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(24px);
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
-      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 32px;
-      max-width: 440px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.28),
+        inset 0 1px rgba(255, 255, 255, 0.4);
       width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
+      max-width: 440px;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(130deg, rgba(255, 255, 255, 0.35), transparent 40%);
+      pointer-events: none;
     }
 
     @keyframes fade {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+      0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.96);
+      }
+      70% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
+    /* ===== CHAMPS AVEC ANIMATION ===== */
+    .space-y-5 > div {
+      opacity: 0;
+      transform: translateY(15px);
+      animation: showField .6s forwards;
+    }
+
+    .space-y-5 > div:nth-child(1) {
+      animation-delay: 0.15s;
+    }
+
+    .space-y-5 > div:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+
+    @keyframes showField {
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* ===== FORMULAIRES ===== */
     .form-control {
       width: 100%;
       padding: 16px 18px 16px 48px;
@@ -72,15 +150,20 @@
       transition: 0.25s;
       font-size: 15px;
       color: #0f172a;
+      position: relative;
+      z-index: 1;
     }
+
     .form-control:focus {
       border-color: #84cc16;
       box-shadow: 0 0 0 5px rgba(132, 204, 22, 0.15);
       outline: none;
     }
+
     .form-control:hover {
       border-color: #84cc16;
     }
+
     .form-control::placeholder {
       color: #94a3b8;
     }
@@ -93,22 +176,46 @@
       font-size: 1.2rem;
       color: #94a3b8;
       pointer-events: none;
+      z-index: 2;
     }
 
+    /* ===== BOUTON ===== */
     .btn-gradient {
+      position: relative;
+      overflow: hidden;
       background: linear-gradient(135deg, #84cc16, #65a30d);
       transition: 0.3s;
       box-shadow: 0 12px 30px rgba(132, 204, 22, 0.35);
+      z-index: 1;
     }
+
+    .btn-gradient::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -120%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+      transition: left 1s ease;
+      pointer-events: none;
+    }
+
+    .btn-gradient:hover::before {
+      left: 150%;
+    }
+
     .btn-gradient:hover {
       background: linear-gradient(135deg, #65a30d, #4d7c0f);
       transform: translateY(-2px);
       box-shadow: 0 20px 40px rgba(132, 204, 22, 0.4);
     }
+
     .btn-gradient:active {
       transform: scale(0.96);
     }
 
+    /* ===== AUTRES ===== */
     .error-box {
       border-radius: 16px;
       border-left: 4px solid #ef4444;
@@ -141,10 +248,34 @@
       height: 1px;
       background: #e2e8f0;
     }
+
+    .bg-slate-50 {
+      background-color: #f8fafc;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 480px) {
+      body {
+        padding: 20px 12px;
+      }
+      .card {
+        border-radius: 24px;
+      }
+      .py-8 {
+        padding-top: 24px;
+        padding-bottom: 24px;
+      }
+      .px-8 {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+      .text-3xl {
+        font-size: 1.75rem;
+      }
+    }
   </style>
 </head>
 <body>
-
   <div class="card">
 
     <!-- Header -->
@@ -216,6 +347,5 @@
 
     </div>
   </div>
-
 </body>
 </html>

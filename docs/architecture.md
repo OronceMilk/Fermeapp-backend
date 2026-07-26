@@ -176,7 +176,28 @@ Deux mécanismes coexistent, avec un choix explicite documenté par module :
 
 \---
 
+## P15 — Finances réelles : frontière avec `MouvementStock`
 
+Le modèle `finances.Transaction` a été introduit pour couvrir tout mouvement financier qui n'a **aucune représentation ailleurs** dans le système : ventes (recettes) et dépenses hors-stock (salaires, vétérinaire, location, transport). Il ne couvre volontairement **pas** les achats de produits stockés (aliment, vaccins, semences) — ceux-ci restent exclusivement portés par `stocks.MouvementStock` (type `ENTREE`), pour éviter tout double-comptage dans `dashboard/services/finance_service.py::get_finances()`.
 
+`get_finances()` calcule désormais : `dépenses = MouvementStock (achats de stock) + Transaction (dépenses hors-stock)`, `recettes = Transaction (ventes)`. L'ancienne estimation `recettes = dépenses * 1.3` (présente depuis le MVP initial) a été retirée à ce moment — elle n'existe plus nulle part dans le code depuis P15.
+
+Une fonction séparée, `get_finances_mois()`, a été ajoutée pour la fenêtre mensuelle plutôt que de modifier la signature de `get_finances()` (cumul total, déjà consommée ailleurs) — décision prise pour ne pas risquer de régression sur le code existant.
+
+## P16 — UX mobile et dérive de périmètre assumée
+
+P16 a été planifié comme un chantier resserré : CSS global pour les champs de formulaire, `inputmode`/`type` adaptés au clavier mobile (`montant`, `téléphone`), vérification du défilement horizontal des tableaux. Cette portée a été délibérément resserrée après plusieurs itérations de revue d'architecture, en écartant consciemment des options plus lourdes (tag de template personnalisé, mixin de formulaire) jugées disproportionnées au nombre réel de formulaires du projet à ce stade (3).
+
+En cours d'exécution, le sprint a débordé vers une refonte visuelle complète des pages `login`/`inscription` (fond dégradé, cartes glassmorphism, animations). Cette dérive a été identifiée et signalée en cours de route. Décision assumée : le résultat est conservé, car il apporte une amélioration UX réelle et cohérente avec le niveau de qualité déjà établi côté backend — mais la méthode (débordement non planifié plutôt que décision préalable) est documentée ici comme un écart au processus habituel du projet, pas comme un nouveau standard à reproduire.
+
+**Seuil de bascule vers une bibliothèque de formulaire dédiée** (ex. Crispy Forms) : à reconsidérer si le nombre de formulaires dépasse largement 15-20 avec une diversité réelle de types de widgets (cases à cocher, fichiers, mises en page conditionnelles) — pas avant, conformément au principe YAGNI appliqué tout au long de ce projet.
+
+## Dette technique connue — `collectstatic` ne copie aucun fichier
+
+Découvert pendant P16 : `python manage.py collectstatic` rapporte systématiquement "0 static files copied", de façon reproductible sur deux environnements indépendants (Windows local, y compris un environnement virtuel entièrement reconstruit à neuf, et Render/Linux en production). Une investigation approfondie — vérification de `STATICFILES_DIRS`, `STATICFILES_FINDERS`, l'ordre d'`INSTALLED_APPS`, absence de commande `collectstatic` personnalisée, version de Django/Python, et enfin instrumentation directe du code source de la commande (`django/contrib/staticfiles/management/commands/collectstatic.py`) — a confirmé que les fichiers sont bien détectés par les finders (143 fichiers trouvés via `get_finders()`) et que les appels de copie s'exécutent sans erreur visible, mais qu'aucun fichier ne se retrouve physiquement sur le disque à la fin de l'exécution.
+
+**La cause racine n'a pas été identifiée.** Un contournement a été mis en place dans `build.sh` : après l'appel (inefficace) à `collectstatic`, une copie manuelle (`cp -rn`) rapatrie les fichiers du projet (`static/`) ainsi que les assets de `django.contrib.admin` et `django-cloudinary-storage` (localisés dynamiquement via `python -c "import django/cloudinary; ..."`, pas de chemin en dur) directement dans `staticfiles/`.
+
+**Limite connue de ce contournement** : `STATICFILES_STORAGE` reste sur `django.contrib.staticfiles.storage.StaticFilesStorage` (stockage plat, sans hash de cache-busting) plutôt que `whitenoise.storage.CompressedManifestStaticFilesStorage` (utilisé jusqu'à ce diagnostic) — un retour à ce dernier casserait le contournement, car les fichiers copiés manuellement n'auraient aucune entrée dans le manifeste `staticfiles.json` que seul un `collectstatic` fonctionnel peut générer. **Si le cache-busting par hash redevient nécessaire, ce point devra être réinvestigué en profondeur avant toute tentative de réactivation du manifeste.**
 
 

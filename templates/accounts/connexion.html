@@ -1,0 +1,220 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connexion — FermeApp</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            lime: '#84CC16',
+            'lime-dark': '#65A30D',
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      min-height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(132, 204, 22, 0.18), transparent 28%),
+        radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.06), transparent 35%),
+        linear-gradient(135deg, #0f2942, #17324d, #244f7a);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      backdrop-filter: blur(100px);
+      pointer-events: none;
+    }
+
+    .card {
+      animation: fade .7s ease;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(24px);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 32px;
+      max-width: 440px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 16px 18px 16px 48px;
+      border-radius: 16px;
+      border: 1px solid #dbe4ef;
+      background: #fff;
+      transition: 0.25s;
+      font-size: 15px;
+      color: #0f172a;
+    }
+    .form-control:focus {
+      border-color: #84cc16;
+      box-shadow: 0 0 0 5px rgba(132, 204, 22, 0.15);
+      outline: none;
+    }
+    .form-control:hover {
+      border-color: #84cc16;
+    }
+    .form-control::placeholder {
+      color: #94a3b8;
+    }
+
+    .icon-input {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+
+    .btn-gradient {
+      background: linear-gradient(135deg, #84cc16, #65a30d);
+      transition: 0.3s;
+      box-shadow: 0 12px 30px rgba(132, 204, 22, 0.35);
+    }
+    .btn-gradient:hover {
+      background: linear-gradient(135deg, #65a30d, #4d7c0f);
+      transform: translateY(-2px);
+      box-shadow: 0 20px 40px rgba(132, 204, 22, 0.4);
+    }
+    .btn-gradient:active {
+      transform: scale(0.96);
+    }
+
+    .error-box {
+      border-radius: 16px;
+      border-left: 4px solid #ef4444;
+      background: #fef2f2;
+      padding: 12px 16px;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .link-hover {
+      transition: 0.2s;
+    }
+    .link-hover:hover {
+      color: #65a30d;
+    }
+
+    .separator {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: #94a3b8;
+      font-size: 0.75rem;
+    }
+    .separator::before,
+    .separator::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-lime to-lime-dark py-8 px-8 text-center">
+      <div class="mx-auto w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center backdrop-blur text-3xl">
+        🌿
+      </div>
+      <h2 class="mt-5 text-3xl font-black text-white">Bienvenue</h2>
+      <p class="mt-2 text-white/80 text-sm">Connectez-vous à votre exploitation</p>
+    </div>
+
+    <!-- Formulaire -->
+    <div class="px-8 py-8 space-y-6">
+
+      {% if form.errors %}
+      <div class="error-box text-sm text-red-700">
+        <span>⚠️</span> Nom d'utilisateur ou mot de passe incorrect.
+      </div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="space-y-5">
+
+          <!-- Champ Username -->
+          <div>
+            <label for="id_username" class="block text-sm font-semibold text-slate-700 mb-2">Nom d'utilisateur</label>
+            <div class="relative">
+              <span class="icon-input">👤</span>
+              <input type="text" name="username" id="id_username" class="form-control" placeholder="Votre nom d'utilisateur" required autofocus />
+            </div>
+          </div>
+
+          <!-- Champ Password -->
+          <div>
+            <label for="id_password" class="block text-sm font-semibold text-slate-700 mb-2">Mot de passe</label>
+            <div class="relative">
+              <span class="icon-input">🔒</span>
+              <input type="password" name="password" id="id_password" class="form-control" placeholder="Votre mot de passe" required />
+            </div>
+            <div class="flex justify-end mt-2">
+              <a href="#" class="text-sm text-slate-500 link-hover">Mot de passe oublié ?</a>
+            </div>
+          </div>
+
+        </div>
+
+        <button type="submit" class="btn-gradient w-full rounded-2xl py-4 font-bold text-base text-white transition-all duration-300 hover:shadow-2xl active:scale-95 flex justify-center items-center gap-3 mt-4">
+          <span>🚜</span> Accéder à mon exploitation
+        </button>
+      </form>
+
+      <!-- Séparateur -->
+      <div class="separator">ou</div>
+
+      <!-- Lien inscription -->
+      <div class="rounded-2xl bg-slate-50 p-6 text-center">
+        <p class="text-slate-600 text-sm">Nouveau sur FermeApp ?</p>
+        <a href="{% url 'accounts:inscription' %}" class="mt-3 inline-flex items-center gap-2 font-semibold text-lime-600 link-hover">
+          🌱 Créer une exploitation
+        </a>
+      </div>
+
+      <!-- Sécurisé -->
+      <div class="text-center pt-2">
+        <p class="text-xs text-slate-400">🔒 Connexion sécurisée • Données protégées</p>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

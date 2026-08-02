@@ -167,12 +167,26 @@ class Animal(models.Model):
     def clean(self):
         super().clean()
 
+        # 1. Validation : date de naissance < date d'arrivée
         if self.date_naissance and self.date_arrivee:
             if self.date_naissance > self.date_arrivee:
                 raise ValidationError("La date de naissance ne peut pas être après la date d'arrivée.")
 
+        # 2. Validation : l'espèce de l'animal doit correspondre au lot
         if self.lot and self.lot.espece != self.espece:
             raise ValidationError("L'espèce de l'animal doit correspondre au lot.")
+
+        # 3. 🔥 NOUVEAU : Validation de la capacité du lot
+        if self.lot:
+            # Compter les animaux déjà dans le lot (sauf l'animal en cours de modification)
+            animaux_dans_lot = Animal.objects.filter(lot=self.lot)
+            if self.pk:
+                animaux_dans_lot = animaux_dans_lot.exclude(pk=self.pk)
+            
+            if animaux_dans_lot.count() >= self.lot.nombre_sujets:
+                raise ValidationError({
+                    'lot': f"Ce lot a atteint sa capacité maximale ({self.lot.nombre_sujets} sujets)."
+                })
 
     def save(self, *args, **kwargs):
         self.full_clean()

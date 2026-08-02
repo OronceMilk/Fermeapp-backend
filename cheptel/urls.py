@@ -17,11 +17,10 @@ from .views import (
     TraitementCreateView,
     TraitementUpdateView,
     TraitementDeleteView,
+    lots_par_espece,  # 🔥 NOUVEAU : Import de la vue HTMX
 )
 
-app_name = 'cheptel'  # ← AJOUTE CETTE LIGNE !
-
-# cheptel/urls.py (ajoute dans urlpatterns)
+app_name = 'cheptel'
 
 urlpatterns = [
     # URLs existantes des animaux
@@ -30,7 +29,7 @@ urlpatterns = [
     path('<int:pk>/edit/', AnimalUpdateView.as_view(), name='animal_edit'),
     path('<int:pk>/delete/', AnimalDeleteView.as_view(), name='animal_delete'),
     
-    # 🔥 NOUVELLES URLs pour les lots
+    # 🔥 URLs pour les lots
     path('lots/', LotListView.as_view(), name='lot_list'),
     path('lots/add/', LotCreateView.as_view(), name='lot_create'),
     path('lots/<int:pk>/edit/', LotUpdateView.as_view(), name='lot_edit'),
@@ -48,4 +47,7 @@ urlpatterns = [
     path('traitements/add/', TraitementCreateView.as_view(), name='traitement_add'),
     path('traitements/<int:pk>/edit/', TraitementUpdateView.as_view(), name='traitement_edit'),
     path('traitements/<int:pk>/delete/', TraitementDeleteView.as_view(), name='traitement_delete'),
+
+    # 🔥 NOUVEAU : API HTMX pour filtrer les lots par espèce
+    path('api/lots-par-espece/', lots_par_espece, name='lots_par_espece'),
 ]

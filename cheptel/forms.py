@@ -21,8 +21,13 @@ class AnimalForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Nom optionnel de l\'animal'
             }),
-            'espece': forms.Select(attrs={'class': 'form-control'}),
-            'lot': forms.Select(attrs={'class': 'form-control'}),
+            'espece': forms.Select(attrs={
+                'class': 'form-control',
+                'hx-get': '/cheptel/api/lots-par-espece/',  # 🔥 HTMX
+                'hx-target': '#id_lot',  # 🔥 Cible le champ lot
+                'hx-trigger': 'change',  # 🔥 Déclenché au changement
+            }),
+            'lot': forms.Select(attrs={'class': 'form-control', 'id': 'id_lot'}),
             'race': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Race de l\'animal'
@@ -49,11 +54,24 @@ class AnimalForm(forms.ModelForm):
         # Remplir les choix dynamiquement
         self.fields['espece'].queryset = Espece.objects.all()
         
-        # Filtrer les lots par ferme de l'utilisateur
+        # Filtrer les lots par ferme ET par espèce si une espèce est sélectionnée
         if self.user:
-            self.fields['lot'].queryset = LotPondeuses.objects.filter(ferme=self.user.ferme)
+            lots_queryset = LotPondeuses.objects.filter(ferme=self.user.ferme)
         else:
-            self.fields['lot'].queryset = LotPondeuses.objects.all()
+            lots_queryset = LotPondeuses.objects.all()
+        
+        # Si une espèce est déjà sélectionnée (création ou modification), filtrer par espèce
+        if self.data and 'espece' in self.data:
+            try:
+                espece_id = int(self.data.get('espece'))
+                lots_queryset = lots_queryset.filter(espece_id=espece_id)
+            except (ValueError, TypeError):
+                pass
+        elif self.instance and self.instance.pk and self.instance.espece:
+            # En modification, filtrer par l'espèce de l'animal
+            lots_queryset = lots_queryset.filter(espece=self.instance.espece)
+        
+        self.fields['lot'].queryset = lots_queryset
         
         # Ajouter des classes CSS
         for field in self.fields:
@@ -70,6 +88,18 @@ class AnimalForm(forms.ModelForm):
             raise forms.ValidationError(
                 f"L'espèce '{espece.nom}' ne correspond pas au lot '{lot.nom}' (espèce: {lot.espece.nom})"
             )
+        
+        # 🔥 Validation de la capacité du lot
+        if lot:
+            # Compter les animaux déjà dans le lot (sauf l'animal en cours de modification)
+            animaux_dans_lot = Animal.objects.filter(lot=lot)
+            if self.instance and self.instance.pk:
+                animaux_dans_lot = animaux_dans_lot.exclude(pk=self.instance.pk)
+            
+            if animaux_dans_lot.count() >= lot.nombre_sujets:
+                raise forms.ValidationError({
+                    'lot': f"Ce lot a atteint sa capacité maximale ({lot.nombre_sujets} sujets)."
+                })
         
         return cleaned_data
 

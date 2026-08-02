@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db.models import Avg, Sum
+from django.http import HttpResponse  # 🔥 NOUVEAU : Pour la réponse HTMX
 from datetime import date, timedelta
 from accounts.decorators import admin_required
 from .models import Animal, Espece, LotPondeuses, RapportJournalier, Traitement
@@ -22,6 +23,31 @@ from .services import (
     get_traitements_ferme, get_alertes_rappel, creer_traitement,
     get_rapports_ferme, get_stats_rapports_mois, creer_lot,
 )
+
+
+# ==============================
+# 🔥 NOUVEAU : API HTMX pour filtrer les lots par espèce
+# ==============================
+def lots_par_espece(request):
+    """Vue HTMX pour filtrer les lots par espèce"""
+    espece_id = request.GET.get('espece')
+    
+    if espece_id and espece_id.isdigit():
+        lots = LotPondeuses.objects.filter(
+            ferme=request.user.ferme,
+            espece_id=int(espece_id)
+        ).order_by('nom')
+    else:
+        lots = LotPondeuses.objects.none()
+    
+    # Générer les options HTML
+    options = '<option value="">---------</option>'
+    for lot in lots:
+        animaux_dans_lot = lot.animaux.count()
+        options += f'<option value="{lot.id}">{lot.nom} ({animaux_dans_lot}/{lot.nombre_sujets} sujets)</option>'
+    
+    return HttpResponse(options)
+
 
 # ==============================
 # ANIMAUX
@@ -384,8 +410,9 @@ class TraitementCreateView(LoginRequiredMixin, CreateView):
         return kwargs
     
     def form_valid(self, form):
-        creer_traitement(form, ferme=self.request.user.ferme, operateur=self.request.user)
-        messages.success(self.request, f"✅ {form.instance.get_type_display()} enregistré pour {form.instance.animal.identifiant}")
+        traitement = creer_traitement(form, ferme=self.request.user.ferme, operateur=self.request.user)
+        self.object = traitement
+        messages.success(self.request, f"✅ {traitement.get_type_display()} enregistré pour {traitement.animal.identifiant}")
         return redirect(self.get_success_url())
     
     def get_context_data(self, **kwargs):

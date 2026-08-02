@@ -10,7 +10,9 @@ from cheptel.services import (
     creer_lot,
 )
 from datetime import date, timedelta
+
 pytestmark = pytest.mark.django_db
+
 
 def test_get_animaux_ferme_isole_par_ferme(ferme, ferme_autre, espece):
     Animal.objects.create(identifiant="A1", ferme=ferme, espece=espece, sexe="F")
@@ -20,6 +22,7 @@ def test_get_animaux_ferme_isole_par_ferme(ferme, ferme_autre, espece):
     assert resultat.count() == 1
     assert resultat.first().identifiant == "A1"
 
+
 def test_get_animaux_ferme_filtre_par_statut(ferme, espece):
     Animal.objects.create(identifiant="A1", ferme=ferme, espece=espece, sexe="F", statut="ACTIF")
     Animal.objects.create(identifiant="A2", ferme=ferme, espece=espece, sexe="M", statut="VENDU")
@@ -27,6 +30,7 @@ def test_get_animaux_ferme_filtre_par_statut(ferme, espece):
     resultat = get_animaux_ferme(ferme, statut="VENDU")
     assert resultat.count() == 1
     assert resultat.first().identifiant == "A2"
+
 
 def test_get_stats_cheptel_compte_correctement(ferme, espece):
     Animal.objects.create(identifiant="A1", ferme=ferme, espece=espece, sexe="F", statut="ACTIF")
@@ -36,8 +40,8 @@ def test_get_stats_cheptel_compte_correctement(ferme, espece):
     stats = get_stats_cheptel(ferme)
     assert stats == {'total': 3, 'actif': 1, 'decede': 1, 'vendu': 1}
 
+
 def test_get_lots_avec_comptage_annotation_correcte(ferme, espece):
-    from datetime import date
     lot = LotPondeuses.objects.create(
         nom="Lot X", ferme=ferme, espece=espece,
         nombre_sujets=10, date_mise_en_place=date.today() - timedelta(days=1),
@@ -48,12 +52,12 @@ def test_get_lots_avec_comptage_annotation_correcte(ferme, espece):
     lots = get_lots_avec_comptage(ferme)
     assert lots.get(pk=lot.pk).nb_animaux == 2
 
+
 def test_get_lots_avec_comptage_une_seule_requete(ferme, espece, django_assert_max_num_queries):
     """
     Preuve directe de la correction du N+1 : peu importe le nombre de lots,
     une seule requête doit être exécutée pour obtenir tous les comptages.
     """
-    from datetime import date
     for i in range(5):
         LotPondeuses.objects.create(
             nom=f"Lot {i}", ferme=ferme, espece=espece,
@@ -64,6 +68,7 @@ def test_get_lots_avec_comptage_une_seule_requete(ferme, espece, django_assert_m
         lots = list(get_lots_avec_comptage(ferme))
         for lot in lots:
             _ = lot.nb_animaux
+
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from cheptel.forms import AnimalForm
@@ -121,7 +126,7 @@ def test_mettre_a_jour_animal_preserve_createur_original(ferme, espece, admin_us
     # Créer un autre utilisateur (pas ADMIN, pour éviter la contrainte d'unicité)
     autre_user = User.objects.create_user(
         username="autre_user", email="autre@test.com", password="TestPass123!",
-        ferme=ferme, role="EMPLOYE",  # 🔥 CHANGEMENT : EMPLOYE au lieu de ADMIN
+        ferme=ferme, role="EMPLOYE",
     )
     from cheptel.models import Animal
     animal = Animal.objects.create(
@@ -139,7 +144,8 @@ def test_mettre_a_jour_animal_preserve_createur_original(ferme, espece, admin_us
     assert animal_maj.createur == admin_user  # pas autre_user, malgré qui a fait la modification
     assert animal_maj.statut == 'VENDU'  # le reste de la modification s'applique bien
 
-    from datetime import date, timedelta
+
+from datetime import date, timedelta
 from cheptel.forms import TraitementForm
 from cheptel.services import get_traitements_ferme, get_alertes_rappel, creer_traitement
 
@@ -205,7 +211,8 @@ def test_creer_traitement_pas_de_double_enregistrement(ferme, animal, produit, a
 
     assert Traitement.objects.filter(animal=animal, type='VACCIN').count() == 1
 
-    from cheptel.services import get_rapports_ferme, get_stats_rapports_mois, creer_lot
+
+from cheptel.services import get_rapports_ferme, get_stats_rapports_mois, creer_lot
 
 
 def test_get_rapports_ferme_filtre_par_annee_et_mois(ferme, admin_user):
@@ -219,17 +226,20 @@ def test_get_rapports_ferme_filtre_par_annee_et_mois(ferme, admin_user):
 
 def test_get_stats_rapports_mois_agrege_le_mois_en_cours(ferme, admin_user):
     from cheptel.models import RapportJournalier
-    today = date.today() - timedelta(days=1)
+    
+    # 🔥 Utiliser une date fixe pour garantir que les deux rapports sont dans le même mois
+    base_date = date(2026, 7, 15)
+    
     RapportJournalier.objects.create(
-        ferme=ferme, date=today, createur=admin_user,
+        ferme=ferme, date=base_date, createur=admin_user,
         nombre_morts=2, oeufs_pondus=50, aliment_kg=10,
     )
     RapportJournalier.objects.create(
-        ferme=ferme, date=today - timedelta(days=1), createur=admin_user,
+        ferme=ferme, date=base_date - timedelta(days=1), createur=admin_user,
         nombre_morts=1, oeufs_pondus=40, aliment_kg=8,
     )
 
-    stats = get_stats_rapports_mois(ferme)
+    stats = get_stats_rapports_mois(ferme, annee=2026, mois=7)
     assert stats['total_morts_mois'] == 3
     assert stats['total_oeufs_mois'] == 90
     assert stats['moyenne_aliment'] == 9.0
@@ -239,7 +249,8 @@ def test_get_stats_rapports_mois_zero_si_aucun_rapport(ferme):
     stats = get_stats_rapports_mois(ferme)
     assert stats == {'total_morts_mois': 0, 'total_oeufs_mois': 0, 'moyenne_aliment': 0}
 
-    from cheptel.forms import LotForm
+
+from cheptel.forms import LotForm
 from cheptel.services import creer_lot
 
 

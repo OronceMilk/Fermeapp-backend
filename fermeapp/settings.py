@@ -114,9 +114,13 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
+] + [
+    BASE_DIR / app_name / 'static'
+    for app_name in ['accounts', 'cheptel', 'cultures', 'stocks', 'finances', 'dashboard']
+    if (BASE_DIR / app_name / 'static').exists()
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # ============================================
 # DEFAULT PRIMARY KEY

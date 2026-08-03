@@ -11,10 +11,13 @@ python manage.py collectstatic --noinput
 echo "📋 Copie de secours des fichiers statiques (contournement collectstatic)..."
 mkdir -p staticfiles
 
-# Fichiers du projet
-if [ -d "static" ]; then
-    cp -rn static/. staticfiles/ 2>/dev/null || true
-fi
+# Fichiers du projet et des applications Django
+for static_dir in $(find . -type d -name static | sort); do
+    if [ "$static_dir" = "." ]; then
+        continue
+    fi
+    cp -rn "$static_dir"/. staticfiles/ 2>/dev/null || true
+done
 
 # Assets Django admin
 DJANGO_ADMIN_STATIC=$(python -c "import django, os; print(os.path.join(os.path.dirname(django.__file__), 'contrib', 'admin', 'static', 'admin'))" 2>/dev/null)

@@ -239,7 +239,7 @@ def test_get_stats_rapports_mois_agrege_le_mois_en_cours(ferme, admin_user):
         nombre_morts=1, oeufs_pondus=40, aliment_kg=8,
     )
 
-    stats = get_stats_rapports_mois(ferme)
+    stats = get_stats_rapports_mois(ferme, annee=2026, mois=7)
     assert stats['total_morts_mois'] == 3
     assert stats['total_oeufs_mois'] == 90
     assert stats['moyenne_aliment'] == 9.0

@@ -107,18 +107,31 @@ def get_rapports_ferme(ferme, annee=None, mois=None):
         queryset = queryset.filter(date__month=mois)
     return queryset
 
-def get_stats_rapports_mois(ferme):
+def get_stats_rapports_mois(ferme, annee=None, mois=None):
+    """
+    Calcule les statistiques du mois pour une ferme.
+    Si annee et mois ne sont pas fournis, utilise le mois en cours.
+    """
     today = date.today()
-    rapports_mois = RapportJournalier.objects.filter(
-        ferme=ferme, date__year=today.year, date__month=today.month,
+    
+    if annee is None:
+        annee = today.year
+    if mois is None:
+        mois = today.month
+    
+    rapports = RapportJournalier.objects.filter(
+        ferme=ferme,
+        date__year=annee,
+        date__month=mois
     )
+    
+    total_morts = rapports.aggregate(Sum('nombre_morts'))['nombre_morts__sum'] or 0
+    total_oeufs = rapports.aggregate(Sum('oeufs_pondus'))['oeufs_pondus__sum'] or 0
+    
+    avg_aliment = rapports.aggregate(Avg('aliment_kg'))['aliment_kg__avg'] or 0
+    
     return {
-        'total_morts_mois': rapports_mois.aggregate(Sum('nombre_morts'))['nombre_morts__sum'] or 0,
-        'total_oeufs_mois': rapports_mois.aggregate(Sum('oeufs_pondus'))['oeufs_pondus__sum'] or 0,
-        'moyenne_aliment': rapports_mois.aggregate(Avg('aliment_kg'))['aliment_kg__avg'] or 0,
+        'total_morts_mois': total_morts,
+        'total_oeufs_mois': total_oeufs,
+        'moyenne_aliment': avg_aliment,
     }
-
-def creer_lot(form, ferme, createur):
-    form.instance.ferme = ferme
-    form.instance.createur = createur
-    return form.save()

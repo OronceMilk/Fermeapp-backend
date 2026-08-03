@@ -57,6 +57,16 @@ def creer_animal(form, ferme, createur):
     return form.save()
 
 
+def creer_lot(form, ferme, createur):
+    """
+    Enregistre un nouveau lot à partir d'un formulaire déjà validé.
+    Assigne la ferme et le créateur avant l'appel à .save().
+    """
+    form.instance.ferme = ferme
+    form.instance.createur = createur
+    return form.save()
+
+
 def mettre_a_jour_animal(form, user):
     """
     Met à jour un animal existant, en préservant le createur original.
